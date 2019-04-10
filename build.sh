@@ -2,7 +2,7 @@
 
 set -eux 
 
-echo -e "\033[0;32mDeploying updates to GitHub...\033[0m"
+echo -e "Deploy updates to GitHub...\n"
 
 # Build the project. 
 hugo -d docs
@@ -11,7 +11,7 @@ cp CNAME docs/
 cp -rf images docs/
 
 git add -A
-git commit -m "deploy"
+git commit -m "Publish"
 git push 
 
 
