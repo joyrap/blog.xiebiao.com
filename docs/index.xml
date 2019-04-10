@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>活在低处 | 是一种姿态，也是一种现状。</title>
+    <link>http://blog.xiebiao.com/</link>
+    <description>Recent content on 活在低处 | 是一种姿态，也是一种现状。</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <copyright>“来自山川湖海，却囿于昼夜，厨房与爱。”</copyright>
+    <lastBuildDate>Sun, 24 Feb 2019 18:24:47 +0000</lastBuildDate>
+    
+	<atom:link href="http://blog.xiebiao.com/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>About</title>
+      <link>http://blog.xiebiao.com/about/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>http://blog.xiebiao.com/about/</guid>
+      <description>A father. A programmer. A linux user. A freeline skating lover  Email to me: dc -e 36218105788986052264101060322087675063562P</description>
+    </item>
+    
+    <item>
+      <title>读书:How Will You Measure Your Life?</title>
+      <link>http://blog.xiebiao.com/post/2019-02-24-how-will-you-measure-your-life/</link>
+      <pubDate>Sun, 24 Feb 2019 18:24:47 +0000</pubDate>
+      
+      <guid>http://blog.xiebiao.com/post/2019-02-24-how-will-you-measure-your-life/</guid>
+      <description>在读到《How Will You Measure Your Life? 》 这本书之前，是看到一篇辞去亚马逊年薪500万工作的文章，大概是讲随着工作中升职，加薪，工作激情却在逐渐降低，于是就</description>
+    </item>
+    
+    <item>
+      <title>如何跑完半程马拉松</title>
+      <link>http://blog.xiebiao.com/post/2017-02-18-how-to-run-half-marathons/</link>
+      <pubDate>Sat, 18 Feb 2017 18:24:47 +0000</pubDate>
+      
+      <guid>http://blog.xiebiao.com/post/2017-02-18-how-to-run-half-marathons/</guid>
+      <description>是的。 如果你想先喝一碗高质量鸡汤，来加强跑马拉松的决心，那么你可以读读村上春树的《当我谈跑步时,我谈些什么》。 然而我觉得那对你真正跑起来并没</description>
+    </item>
+    
+    <item>
+      <title>如何利用Linux命令简单加密文本</title>
+      <link>http://blog.xiebiao.com/post/2017-02-04-how-to-encrypt-by-linux-command/</link>
+      <pubDate>Sat, 04 Feb 2017 18:24:47 +0000</pubDate>
+      
+      <guid>http://blog.xiebiao.com/post/2017-02-04-how-to-encrypt-by-linux-command/</guid>
+      <description>在web上无论企业还是个人网站，总会发布一些邮箱的联系方式，由于邮箱地址置于html页面中，很容易被 爬虫获取，导致邮箱被垃圾邮件挤满。 所以，</description>
+    </item>
+    
+    <item>
+      <title>Java多维数组</title>
+      <link>http://blog.xiebiao.com/post/2017-01-15-java-multidimensional-arrays/</link>
+      <pubDate>Sun, 15 Jan 2017 20:24:47 +0000</pubDate>
+      
+      <guid>http://blog.xiebiao.com/post/2017-01-15-java-multidimensional-arrays/</guid>
+      <description>说多维数组之前，说说简单的数组定义: {% highlight java %} int[] a; {% endhighlight %} 或者 {% highlight java %} int a[]; {% endhighlight %} 当然也可以一次性定义多个变量 {% highlight java %} int a[], b[],c[]; {% endhighlight %} 再简单不过了。 继</description>
+    </item>
+    
+    <item>
+      <title>我们是如何将一个项目做烂的</title>
+      <link>http://blog.xiebiao.com/post/2016-08-08-how-to-make-projects-failed/</link>
+      <pubDate>Mon, 08 Aug 2016 01:24:47 +0000</pubDate>
+      
+      <guid>http://blog.xiebiao.com/post/2016-08-08-how-to-make-projects-failed/</guid>
+      <description>在你读到这篇牢骚的时候，无数个项目正在慢慢变烂。 既然标题都用到了&amp;rdquo;烂&amp;rdquo;这个词，那什么才是烂呢？ 在你的项目里，&amp;rdq</description>
+    </item>
+    
+    <item>
+      <title>Notification Pattern理解</title>
+      <link>http://blog.xiebiao.com/post/2012-06-20-notification-pattern/</link>
+      <pubDate>Wed, 20 Jun 2012 11:24:47 +0000</pubDate>
+      
+      <guid>http://blog.xiebiao.com/post/2012-06-20-notification-pattern/</guid>
+      <description>场景 在MVC的架构中，我们想从Model层传递一些错误信息到View层，比如用户注册这个功能，用户填写了密码，邮箱，然后提交注册， 这时候我们</description>
+    </item>
+    
+  </channel>
+</rss>

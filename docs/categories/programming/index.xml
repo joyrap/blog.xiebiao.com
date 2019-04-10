@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Programming on 活在低处 | 是一种姿态，也是一种现状。</title>
+    <link>http://blog.xiebiao.com/categories/programming/</link>
+    <description>Recent content in Programming on 活在低处 | 是一种姿态，也是一种现状。</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <copyright>“来自山川湖海，却囿于昼夜，厨房与爱。”</copyright>
+    <lastBuildDate>Sat, 04 Feb 2017 18:24:47 +0000</lastBuildDate>
+    
+	<atom:link href="http://blog.xiebiao.com/categories/programming/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>如何利用Linux命令简单加密文本</title>
+      <link>http://blog.xiebiao.com/post/2017-02-04-how-to-encrypt-by-linux-command/</link>
+      <pubDate>Sat, 04 Feb 2017 18:24:47 +0000</pubDate>
+      
+      <guid>http://blog.xiebiao.com/post/2017-02-04-how-to-encrypt-by-linux-command/</guid>
+      <description>在web上无论企业还是个人网站，总会发布一些邮箱的联系方式，由于邮箱地址置于html页面中，很容易被 爬虫获取，导致邮箱被垃圾邮件挤满。 所以，</description>
+    </item>
+    
+    <item>
+      <title>Java多维数组</title>
+      <link>http://blog.xiebiao.com/post/2017-01-15-java-multidimensional-arrays/</link>
+      <pubDate>Sun, 15 Jan 2017 20:24:47 +0000</pubDate>
+      
+      <guid>http://blog.xiebiao.com/post/2017-01-15-java-multidimensional-arrays/</guid>
+      <description>说多维数组之前，说说简单的数组定义: {% highlight java %} int[] a; {% endhighlight %} 或者 {% highlight java %} int a[]; {% endhighlight %} 当然也可以一次性定义多个变量 {% highlight java %} int a[], b[],c[]; {% endhighlight %} 再简单不过了。 继</description>
+    </item>
+    
+    <item>
+      <title>Notification Pattern理解</title>
+      <link>http://blog.xiebiao.com/post/2012-06-20-notification-pattern/</link>
+      <pubDate>Wed, 20 Jun 2012 11:24:47 +0000</pubDate>
+      
+      <guid>http://blog.xiebiao.com/post/2012-06-20-notification-pattern/</guid>
+      <description>场景 在MVC的架构中，我们想从Model层传递一些错误信息到View层，比如用户注册这个功能，用户填写了密码，邮箱，然后提交注册， 这时候我们</description>
+    </item>
+    
+  </channel>
+</rss>
