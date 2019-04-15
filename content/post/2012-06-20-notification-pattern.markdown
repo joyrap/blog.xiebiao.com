@@ -13,7 +13,7 @@ draft: false
 ## 思路
 先定义Notification:
 
-{% highlight java %}
+```
 public class Notification {
 	private List _errors;
 
@@ -46,11 +46,11 @@ public class Notification {
 		}
 	}
 }
-{% endhighlight %}
+```
 
 定义IDomainValidator接口，如果是接口，notification就是实例共享的，在调用完errors方法后，需要clear，注意防止多线程问题，我这里用的抽象类 
 
-{% highlight java %}
+```
 public abstract class IDomainValidator {
 	/* 校验结果通知 */
 	protected Notification notification;
@@ -60,11 +60,11 @@ public abstract class IDomainValidator {
 	}
 	abstract void validate();
 }
-{% endhighlight %}
+```
 
 领域模型：
 
-{% highlight java %}
+```
 public class User extends IDomainValidator {
 	private String name;
 	private int age;
@@ -98,11 +98,11 @@ public class User extends IDomainValidator {
 		this.age = age;
 	}
 }
-{% endhighlight %}
+```
 
 测试: 
 
-{% highlight java %}
+```
 public static void main(String[] args) {
       User user = new User("xiaog", 17);
       user.validate();
@@ -113,7 +113,7 @@ public static void main(String[] args) {
       }
      }
 }
-{% endhighlight %}
+```
 
 Notification模式的好处是： 
 
