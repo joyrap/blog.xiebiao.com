@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  翻译:Understanding the LMAX Disruptor
-date:   2019-04-18 18:24:47
+date:   2019-04-20 18:24:47
 categories: ["Translate","Programming"]
 tags: ["Disruptor"]
 ---
@@ -403,7 +403,7 @@ disruptor.handleEventsWith(
 
 然后我们可以启动 Disruptor，返回一个`RingBuffer`实例。
 
-......
+未完待续......
 
 >原文地址:[https://itnext.io/understanding-the-lmax-disruptor-caaaa2721496](https://itnext.io/understanding-the-lmax-disruptor-caaaa2721496)
 
@@ -411,7 +411,10 @@ disruptor.handleEventsWith(
 
 ### 翻译后记
 
+#### 关于翻译
 很早以前发现使用英译中工具查单词，有个严重的误区，比如`ruin`这个单词，百度翻译/有道翻译/google翻译基本都是告诉你中文意思为：`毁灭；使破产`。
 但是用[朗文翻译](https://www.ldoceonline.com/dictionary/ruin)得到的英文解释为: `to spoil or destroy something completely`,这个解释里面明显有个`程度`在里面，
 如果翻译成`毁灭`就显得生硬，影响理解。
+
+
 
