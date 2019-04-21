@@ -8,8 +8,7 @@ tags: ["Disruptor"]
 
 ### 翻译前言
 
-知道Disruptor这个代码库，是在Log4j 1.X升级版Log4j2中提到的，那时候就好奇它为何如此高效，
-关于Disruptor的文章在[ifeve.com](http://ifeve.com/disruptor/)上已经有很多了，这一篇讲的更简单。
+知道Disruptor这个代码库，是在Log4j 1.X升级Log4j2中提到的，那时候就好奇它为何如此高效，关于Disruptor的文章在[ifeve.com](http://ifeve.com/disruptor/)上已经有很多了，这一篇讲的更简单。
 
 由于个人英文水平有限，更多是意译。
 
@@ -21,14 +20,14 @@ tags: ["Disruptor"]
 
 ![understanding-the-lmax-disruptor](/images/2019-04-19-understanding-the-lmax-disruptor/1_faUySbv7t8aAFm0X1zTMwg.png "")
 
-- LMAX Disuptor 的解决方案比`ArrayBlockingQueue`和`LinkedBlockingQueue`要快。
-- 更好的理解底层硬件可以让成为更好的开发人员。
-- 在线程中共享内存很容易引发问题，需要小心。
+- LMAX Disuptor 比`ArrayBlockingQueue`和`LinkedBlockingQueue`要快。
+- [Mechanical sympathy](https://mechanical-sympathy.blogspot.com/)让你成为更好的开发人员。(懂得底层硬件)
+- 在线程间共享内存很容易引发问题，你需要小心对待。
 - CPU缓存比主存更快，但是不懂他们是如何工作的(行缓存，等等)反而会严重影响性能。
 
 ### 内存伪共享
 
-举个例子，我们需要对一个计数器循环递增到`MAX`:
+举个例子，我们需要对一个计数循环递增到`MAX`:
 
 ```
 public void simple() {
@@ -77,7 +76,7 @@ public void multi() throws Exception {
 
 可是这个实现有两个问题。
 
-首先,多次执行将`MAX`累加到1百万，很显然这和我们期望输出`counter=1000000`结果,有点不一样。(这里完全是个人为了句子更符合中文语景)
+首先,多次执行将`MAX`累加到1百万，很显然这和我们期望输出结果`counter=1000000`有点不一样。(这里完全是个人为了句子更符合中文语景)
 
 ```
 counter=522388
@@ -87,13 +86,11 @@ counter=532331
 ```
 由于变量 `sharedCounter`上的条件竞争，执行结果出现了不确定性。
 
-当结果依赖进程/线程的执行顺序和执行时间，就会出现竞争条件。(有的中文书简称竞态)
-发生这种情况，是因为`sharedCounter`在没有被保护的情况下，同时被两个线程修改。
+当线程间执行依赖执行顺序和执行时间，就会出现竞态。发生这种情况，是因为`sharedCounter`在没有被保护的情况下，同时被两个线程修改。
 
-其次，至于性能，即使忽略两个线程对值很大的`MAX`的管理，这个结果依然要慢3倍(文章这里应该是在和单线程下执行结果做比较)。这是什么原因？
+其次，至于性能，如果将`MAX`的值设置大到足以忽略两个线程的管理，这个结果依然要慢3倍(文章这里应该是在和单线程下执行结果做比较)。这是什么原因？
 
-由于两个线程属于CPU计算密集型，操作系统很有可能会将他们分配到不同的CPU内核上，另外，我们有理由相信
-两个运行在不同内核上的线程可以自由共享内存，然而，我们忘了CPU缓存的概念:
+由于两个线程属于CPU计算密集型，操作系统很有可能会将他们分配到不同的CPU内核上，另外，我们有理由相信两个运行在不同内核上的线程可以自由共享内存，然而，我们忘了CPU缓存的概念:
 
 ![understanding-the-lmax-disruptor](http://blog.xiebiao.com/images/2019-04-19-understanding-the-lmax-disruptor/1_I_7Ju4oDPgTYO6Y-uPqdQg.png "Memory layers")
 
@@ -119,7 +116,7 @@ L3 CACHE hit          (~60.0 ns) |
 一个缓存行是由2的N次方的连续字节组成，常见的是64字节，它由一个非链式的HashMap维护，每个内存地址都影射到指定的缓存行上。
 
 举例,如果两个变量`x`和`y` 被两个不同的CPU内核的线程顺序访问，第一个线程修改`x`，另外一个在很短时间内修改了`y`(原文为啥要精确到纳秒来阐述?)。
-假设两个变量都在同一个缓存行，即使程序只关系变量`y`而不是`x`,第二线程依然会看到整个缓存行被设置成了`无效`，从而导致第二个内核需要重新获得一份缓存行的拷贝(他们可能在2级或者3缓存，甚至在主存中)。
+假设两个变量都在同一个缓存行，即使程序只关心变量`y`而不是`x`,第二线程依然会看到整个缓存行被设置成了`无效`，从而导致第二个内核需要重新获得一份缓存行的拷贝(他们可能在2级或者3缓存，甚至在主存中)。
 
 这个问题就是所谓的`伪共享`,它是影响性能的重要因素(尽管CPU最终会保证执行结果的确定性)。
 
@@ -127,7 +124,7 @@ L3 CACHE hit          (~60.0 ns) |
 
 代码并发执行首先要确保`相互排斥`,这意味着多线程访问相同的资源需要互相协作。
 
-此外，当发生修改，必须对另外的线程可见，这叫着`修改可见性`
+此外，当发生修改，必须对另外的线程可见，这叫`修改可见性`
 
 这是并发的两个主要概念。
 
@@ -184,9 +181,9 @@ Two threads with CAS                             30 000 ms
 
 > Source: Wikipedia
 
-> 内存屏障会引起CPU在屏障指令前后对内存操作指令进行重排。
+> 内存屏障会引起CPU在屏障前后对内存操作指令进行重排。
 
-我们为什么需要这种机制？为了执行性能，大部分现代CPU为了达到最佳性能最终可能会乱序执行。
+我们为什么需要这种机制？大部分现代CPU为了达到最佳性能最终可能会乱序执行。
 
 回到我们第一个例子:
 
@@ -341,7 +338,7 @@ LMAX Disruptor的缔造者发明的[Mechanical Sympathy](https://www.infoq.com/p
 
 我们分析一下原因:
 
-首先,Disruptor基于 [ring buffer structure](https://en.wikipedia.org/wiki/Circular_buffer), 它就像一个个固定长度的缓存区，首尾相连。
+首先,Disruptor基于 [ring buffer structure](https://en.wikipedia.org/wiki/Circular_buffer), 它就像一个个固定长度的缓存区首尾相连。
 
 
 ![understanding-the-lmax-disruptor](http://blog.xiebiao.com/images/2019-04-19-understanding-the-lmax-disruptor/1_soxodeCvj-FY8vrl_WY6kA.png "Ring buffer structure")
@@ -381,10 +378,10 @@ disruptor.handleEventsWith(
 对`handleEventsWith()`我们提供lambda表达式, lambda有三个输入:
 
 - 事件本身
-- 一个唯一序号
+- 一个序列号
 - 是否批量处理
 
-多生产者的情况下，他们都会收到每个事件，如果我们像分开加载，我们可以实现基于唯一序号的分片策略，像这样:
+多生产者的情况下，他们都会收到每个事件，如果我们像分开加载，我们可以实现基于序列号的分片策略，像这样:
 
 ```
 disruptor.handleEventsWith(
@@ -403,11 +400,53 @@ disruptor.handleEventsWith(
 
 然后我们可以启动 Disruptor，返回一个`RingBuffer`实例。
 
-未完待续......
+```
+RingBuffer<MyEvent> ringBuffer = disruptor.start();
+```
+
+当Disruptor实例初始化完成后，我们就可以像下面这样发布事件了:
+
+```
+final long sequence = ringBuffer.next(); // Ask the ring buffer the next sequence
+final MyEvent event = ringBuffer.get(sequence); // Get the event instance
+event.setPayload("Hello, World!"); // Business logic
+ringBuffer.publish(sequence); // Publish an event
+
+```
+序列号表示事件在ring buffer数据结构中的位置。
+
+当我们创建Disruptor实例的时候，我们同时传入了一个`producerType`变量(`ProducerType.SINGLE`或`ProducerType.MULTI`其中之一)，这是告诉Disruptor我们是单个生产者还是多个生产者。
+
+在单个生产者的情况下，`ringBuffer.next()`方法完全是无锁的，另一方面，如果是多个生产者，这个方法通过`CAS`操作从ring buffer中获取下一个可用序列号。
+
+序列号自身通过内存补全方式来确保在缓存行中不存在其他数据:
+
+```
+class LhsPadding {
+    protected long p1, p2, p3, p4, p5, p6, p7;
+}
+
+class Value extends LhsPadding {
+    protected volatile long value;
+}
+
+class RhsPadding extends Value {
+    protected long p9, p10, p11, p12, p13, p14, p15;
+}
+```
+而且，当发布事件的时候，通过创建内存屏障来确保该事件缓存被更新。在ring buffer中添加事件不需要任何锁，所以大大提升了性能。
+
+最后需要提到的是，我们说ring buffer底层是数组，对开发人员来说避免了事件在同一个缓存行中带来的伪共享问题。
+
+
+***Disruptor开发小组将Disruptor与`ArrayBlockingQueue`做了性能对比，对比数据这里就不翻译了，肯定是Disruptor牛逼。***
+
 
 >原文地址:[https://itnext.io/understanding-the-lmax-disruptor-caaaa2721496](https://itnext.io/understanding-the-lmax-disruptor-caaaa2721496)
 
 ------
+### 参考阅读
+- [pefbook](https://mirrors.edge.kernel.org/pub/linux/kernel/people/paulmck/perfbook/perfbook.html)
 
 ### 翻译后记
 
