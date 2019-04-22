@@ -88,7 +88,7 @@ counter=532331
 
 当线程间执行依赖执行顺序和执行时间，就会出现竞态。发生这种情况是因为`sharedCounter`在没有被保护的情况下，同时被两个线程修改。
 
-其次，至于性能，如果将`MAX`的值设置大到足以忽略两个线程的管理，这个结果依然要慢3倍(文章这里应该是在和单线程下执行结果做比较)。这是什么原因？
+其次，至于性能，假设`MAX`的值大到足以忽略两个线程对它的管理，这个结果依然要慢3倍(文章这里应该是在和单线程下执行结果做比较)。这是什么原因？
 
 由于两个线程属于CPU计算密集型，操作系统很有可能会将他们分配到不同的CPU内核上，另外我们有理由相信两个运行在不同内核上的线程可以自由共享内存，然而我们忘了CPU缓存的概念:
 
@@ -259,7 +259,7 @@ public void barrier() throws Exception {
 }
 
 ```
-我们再次运行这个实现 直到`MAX` 到1百万，我们依然期望得到输出  `counter = 1000000`:
+我们再次运行 ,`MAX` 到1百万，看看能不能得到我们预期的输出 `counter = 1000000`:
 
 ```
 -- First multi-threaded implementation without a memory barrier
@@ -437,8 +437,9 @@ class RhsPadding extends Value {
 
 最后需要提到的是，我们说ring buffer底层是数组，对开发人员来说避免了事件在同一个缓存行中带来的伪共享问题。
 
-
+......
 ***Disruptor开发小组将Disruptor与`ArrayBlockingQueue`做了性能对比，对比数据这里就不翻译了，肯定是Disruptor牛逼。***
+......
 
 
 >原文地址:[https://itnext.io/understanding-the-lmax-disruptor-caaaa2721496](https://itnext.io/understanding-the-lmax-disruptor-caaaa2721496)
