@@ -4,7 +4,7 @@ menu: "main"
 weight: 50
 ---
 
-我中文名叫: 谢彪，英文名: Bill Xie，我和家人生活在四川成都(一个疯狂发展的城市)，我热爱运动，尤其是跑步，也喜欢[***漂移板运动(Freeline skates)***](https://freelineskatingz.com/)。
+我中文名叫: 谢彪，英文名: Bill Xie，我和家人生活在四川成都(一个疯狂发展的城市)，我热爱运动，尤其是跑步，也喜欢[漂移板运动(Freeline skates)](https://freelineskatingz.com/)。
 
 这个博客主要用来记录我的一些学习和生活以及一些个人观点，如果你是未来
 的**雇主**，那么你可以通过这个博客来认识我。
