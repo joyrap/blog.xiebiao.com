@@ -5,7 +5,6 @@ set -eux
 echo -e "Publish to blog.xiebiao.com!\n"
 
 rm -rf publish
-git submodule add git@github.com:joyrap/joyrap.github.io  publish
 # Build the project. 
 hugo -d publish
 
