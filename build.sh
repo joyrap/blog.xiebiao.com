@@ -2,15 +2,17 @@
 
 set -eux 
 
-echo -e "Deploy updates to GitHub...\n"
+echo -e "Publish to blog.xiebiao.com!\n"
 
+rm -rf publish
+git submodule add git@github.com:joyrap/joyrap.github.io  publish
 # Build the project. 
-hugo -d docs
+hugo -d publish
 
 # git submodule add git@github.com:joyrap/joyrap.github.io.git docs
 # push docs to `joyrap.github.io`
-cp CNAME docs/
-cp -rf images docs/
+cp CNAME publish/
+cp -rf images publish/
 
 git add -A
 git commit -m "Publish"
