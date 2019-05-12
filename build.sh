@@ -16,7 +16,7 @@ cp -rf images publish/
 
 git add -A
 git commit -m "Publish"
-git push 
+git push --recurse-submodules=check
 
 
 
