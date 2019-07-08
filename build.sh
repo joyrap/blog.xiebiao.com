@@ -16,11 +16,11 @@ cp -rf images publish/
 
 git add -A
 git commit -m "Update"
-git --force push 
+git  push 
 cd publish
 git add -A
 git commit -m "Publish"
-git --force push
+git  push
 
 
 
