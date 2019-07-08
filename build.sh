@@ -7,8 +7,8 @@ echo -e "Publish to blog.xiebiao.com!\n"
 # git submodule add git@github.com:joyrap/joyrap.github.io.git publish
 # Build the project. 
 rm -rf publish
-hugo -d publish
 git submodule add git@github.com:joyrap/joyrap.github.io.git publish
+hugo -d publish
 
 # push docs to `joyrap.github.io`
 cp CNAME publish/
