@@ -6,7 +6,7 @@
     <description>Recent content on 独立，但不独行</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <copyright>“来自山川湖海，却囿于昼夜，厨房与爱。”</copyright>
+    <copyright>“来自山川湖海，却囿于昼夜，厨房与爱。”------万能青年旅店</copyright>
     <lastBuildDate>Sun, 07 Jul 2019 09:24:47 +0000</lastBuildDate>
     
 	<atom:link href="http://blog.xiebiao.com/index.xml" rel="self" type="application/rss+xml" />
@@ -18,7 +18,7 @@
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>http://blog.xiebiao.com/about/</guid>
-      <description>我的中文名叫: 谢彪，英文名: Bill Xie，我和家人生活在中国.四川.成都。 我热爱运动，尤其是跑步，也喜欢漂移板运动(Freeline skates</description>
+      <description>这个博客主要用来记录我的一些学习以及个人观点。 联系我 email: joyrap[at]gmail.com</description>
     </item>
     
     <item>
@@ -36,7 +36,7 @@
       <pubDate>Fri, 19 Apr 2019 21:24:47 +0000</pubDate>
       
       <guid>http://blog.xiebiao.com/post/2019-04-19-understanding-the-lmax-disruptor/</guid>
-      <description>翻译前言 知道Disruptor这个代码库，是在Log4j 1.X升级Log4j2中提到的，那时候就好奇它为何如此高效，关于Disruptor的</description>
+      <description>翻译前言 知道Disruptor这个代码库，是在Log4j 1.X升级版Log4j2中提到的，那时候就好奇它为何如此高效，关于Disruptor</description>
     </item>
     
     <item>

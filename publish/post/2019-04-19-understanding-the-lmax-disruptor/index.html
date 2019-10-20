@@ -16,7 +16,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
 
 
-<meta name="author" content="Bill Xie" /><meta name="description" content="翻译前言 知道Disruptor这个代码库，是在Log4j 1.X升级Log4j2中提到的，那时候就好奇它为何如此高效，关于Disruptor的" /><meta name="keywords" content="Hugo, theme, even" />
+<meta name="author" content="Bill Xie" /><meta name="description" content="翻译前言 知道Disruptor这个代码库，是在Log4j 1.X升级版Log4j2中提到的，那时候就好奇它为何如此高效，关于Disruptor" /><meta name="keywords" content="Hugo, theme, even" />
 
 
 
@@ -39,25 +39,25 @@
 
 
 <meta property="og:title" content="翻译:Understanding the LMAX Disruptor" />
-<meta property="og:description" content="翻译前言 知道Disruptor这个代码库，是在Log4j 1.X升级Log4j2中提到的，那时候就好奇它为何如此高效，关于Disruptor的" />
+<meta property="og:description" content="翻译前言 知道Disruptor这个代码库，是在Log4j 1.X升级版Log4j2中提到的，那时候就好奇它为何如此高效，关于Disruptor" />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="http://blog.xiebiao.com/post/2019-04-19-understanding-the-lmax-disruptor/" /><meta property="article:published_time" content="2019-04-19T21:24:47&#43;00:00"/>
 <meta property="article:modified_time" content="2019-04-19T21:24:47&#43;00:00"/>
 
 <meta itemprop="name" content="翻译:Understanding the LMAX Disruptor">
-<meta itemprop="description" content="翻译前言 知道Disruptor这个代码库，是在Log4j 1.X升级Log4j2中提到的，那时候就好奇它为何如此高效，关于Disruptor的">
+<meta itemprop="description" content="翻译前言 知道Disruptor这个代码库，是在Log4j 1.X升级版Log4j2中提到的，那时候就好奇它为何如此高效，关于Disruptor">
 
 
 <meta itemprop="datePublished" content="2019-04-19T21:24:47&#43;00:00" />
 <meta itemprop="dateModified" content="2019-04-19T21:24:47&#43;00:00" />
-<meta itemprop="wordCount" content="5197">
+<meta itemprop="wordCount" content="5208">
 
 
 
 <meta itemprop="keywords" content="Disruptor," />
 <meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="翻译:Understanding the LMAX Disruptor"/>
-<meta name="twitter:description" content="翻译前言 知道Disruptor这个代码库，是在Log4j 1.X升级Log4j2中提到的，那时候就好奇它为何如此高效，关于Disruptor的"/>
+<meta name="twitter:description" content="翻译前言 知道Disruptor这个代码库，是在Log4j 1.X升级版Log4j2中提到的，那时候就好奇它为何如此高效，关于Disruptor"/>
 
 <!--[if lte IE 9]>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
@@ -152,7 +152,7 @@
 <li><a href="#修改可见性">修改可见性</a></li>
 <li><a href="#传统队列">传统队列</a></li>
 <li><a href="#lmax-disruptor">LMAX Disruptor</a></li>
-<li><a href="#参考阅读">参考阅读</a></li>
+<li><a href="#扩展阅读">扩展阅读</a></li>
 <li><a href="#翻译后记">翻译后记</a>
 <ul>
 <li><a href="#关于翻译">关于翻译</a></li>
@@ -168,7 +168,7 @@
 
 <h3 id="翻译前言">翻译前言</h3>
 
-<p>知道Disruptor这个代码库，是在Log4j 1.X升级Log4j2中提到的，那时候就好奇它为何如此高效，关于Disruptor的文章在<a href="http://ifeve.com/disruptor/">ifeve.com</a>上已经有很多了，这一篇讲的更简单。</p>
+<p>知道Disruptor这个代码库，是在Log4j 1.X升级版Log4j2中提到的，那时候就好奇它为何如此高效，关于Disruptor的文章在<a href="http://ifeve.com/disruptor/">ifeve.com</a>上已经有很多了，这一篇讲的更简单。</p>
 
 <p>由于个人英文水平有限，更多是意译。</p>
 
@@ -176,15 +176,15 @@
 
 <p><a href="https://github.com/LMAX-Exchange/disruptor">LMAX Disruptor</a> 是由一家金融交易平台公司<a href="https://www.lmax.com/">LMAX Exchange</a>开源的Java包,它为线程间的通信问题提供了极其优雅，高效的解决方案。</p>
 
-<p>在这篇博文中，我先描述关于传统排队系统在跨线程之间的内存共享问题，然后，试图弄清楚LAMX Disruptor 在该问题上有什么特别方案，他们是如何做到的。</p>
+<p>在这篇博文中，我先描述关于传统排队系统在跨线程之间的内存共享问题，然后试图弄清楚LAMX Disruptor 在该问题上有什么特别方案，他们是如何做到的。</p>
 
-<p><img src="/images/2019-04-19-understanding-the-lmax-disruptor/1_faUySbv7t8aAFm0X1zTMwg.png" alt="understanding-the-lmax-disruptor" /></p>
+<p><img src="http://blog.xiebiao.com/images/2019-04-19-understanding-the-lmax-disruptor/1_faUySbv7t8aAFm0X1zTMwg.png" alt="understanding-the-lmax-disruptor" /></p>
 
 <ul>
-<li>LMAX Disuptor 比<code>ArrayBlockingQueue</code>和<code>LinkedBlockingQueue</code>更快。</li>
-<li><a href="https://mechanical-sympathy.blogspot.com/">Mechanical sympathy</a>让你成为更好的开发人员。(懂得底层硬件)</li>
-<li>在线程间共享内存很容易出问题，你需要小心对待。</li>
-<li>CPU缓存比主存更快，但是不懂他们是如何工作的(行缓存，等等)反而会严重影响性能。</li>
+<li>LMAX Disuptor 的解决方案比<code>ArrayBlockingQueue</code>和<code>LinkedBlockingQueue</code>要快。</li>
+<li><a href="http://mechanical-sympathy.blogspot.com/">Mechanical sympathy</a>让你成为更好的开发人员。(更好地理解底层硬件)</li>
+<li>在线程中共享内存很容易引发问题，你需要小心对待。</li>
+<li>CPU缓存比主存更快，但是不懂得他们是如何工作的(行缓存，等等)反而会严重影响性能。</li>
 </ul>
 
 <h3 id="内存伪共享">内存伪共享</h3>
@@ -290,15 +290,16 @@ counter=532331</pre></td></tr></table>
 </div>
 <p>由于变量 <code>sharedCounter</code>上的条件竞争，执行结果出现了不确定性。</p>
 
-<p>当线程间执行依赖执行顺序和执行时间，就会出现竞态。发生这种情况是因为<code>sharedCounter</code>在没有被保护的情况下，同时被两个线程修改。</p>
+<p>当线程执行依赖执行顺序和时间，那么就会产生竞态。发生这种情况，是因为<code>sharedCounter</code>在没有被保护的情况下，同时被两个线程修改。</p>
 
-<p>其次，至于性能，假设<code>MAX</code>的值大到足以忽略两个线程对它的管理，这个结果依然要慢3倍(文章这里应该是在和单线程下执行结果做比较)。这是什么原因？</p>
+<p>其次，至于性能，即使<code>MAX</code>被设置成一个很大的值足以忽略两个线程的管理，这个结果依然要慢3倍(文章这里应该是在和单线程下执行结果做比较)。这是什么原因？</p>
 
-<p>由于两个线程属于CPU计算密集型，操作系统很有可能会将他们分配到不同的CPU内核上，另外我们有理由相信两个运行在不同内核上的线程可以自由共享内存，然而我们忘了CPU缓存的概念:</p>
+<p>由于两个线程属于CPU计算密集型，操作系统很有可能会将他们分配到不同的CPU内核上，另外，我们有理由相信
+两个运行在不同内核上的线程可以自由共享内存，然而，我们忘了CPU缓存的概念:</p>
 
 <p><img src="http://blog.xiebiao.com/images/2019-04-19-understanding-the-lmax-disruptor/1_I_7Ju4oDPgTYO6Y-uPqdQg.png" alt="understanding-the-lmax-disruptor" title="Memory layers" /></p>
 
-<p>为了避免每次都访问主存中查询内存地址，CPU会将缓存数据保存在自己的缓存中: 本地一级缓存，二级缓存，和共享三级缓存。</p>
+<p>为了避免每次都访问主存中查询内存地址，CPU会将数据保存在自己的缓存中: 本地一级缓存，二级缓存，和共享三级缓存。</p>
 
 <p><a href="https://software.intel.com/sites/products/collateral/hpc/vtune/performance_analysis_guide.pdf">Core i7 Xeon 5500</a>的特性:</p>
 <div class="highlight"><div class="chroma">
@@ -316,7 +317,7 @@ L3 CACHE hit          (~60.0 ns) |   </pre></td></tr></table>
 </div>
 </div>
 <p>当处理器想访问一个内存地址，首先会在一级缓存中查找，如果不存在，再从二级缓存中查找，同样如果不存在就到三级缓存中查找，
-直到最后到主存中查找(主存比一级缓存慢了大约60倍)。</p>
+直到最后到主存中查找。(主存比一级缓存慢60倍，一级缓存和二级缓存是CPU内核独占，三级缓存是所有CPU内核共享)</p>
 
 <p>在我们的例子中，因为<code>sharedCounter</code> 同时被两个不同的CPU内核更新，变量在两个一级缓存中来回同步，大幅度降低了执行速度。</p>
 
@@ -333,13 +334,13 @@ L3 CACHE hit          (~60.0 ns) |   </pre></td></tr></table>
 
 <p>代码并发执行首先要确保<code>相互排斥</code>,这意味着多线程访问相同的资源需要互相协作。</p>
 
-<p>此外，当发生修改必须对另外的线程可见，这叫<code>修改可见性</code></p>
+<p>此外，当发生修改，必须对另外的线程可见，这叫着<code>修改可见性</code></p>
 
 <p>这是并发的两个主要概念。</p>
 
 <h3 id="互相排斥">互相排斥</h3>
 
-<p><code>锁</code>是实现排斥的一种解决方案，但是他们在公平性上需要仲裁所以显得非常昂贵。操作系统在线程等待锁直到释放之前将其挂起，从而形成上下文
+<p><code>锁</code>是实现排斥的一种可能解决方案，但是他们在竞争中公平仲裁显得非常昂贵。操作系统在线程等待锁直到释放之前将其挂起，从而形成上下文
 切换。</p>
 
 <p>而且，在上下文切换的过程中(当操作系统释放控制，决定去执行其他任务也一样)，执行上下文可能会丢失之前的缓存和指令。</p>
@@ -353,8 +354,8 @@ L3 CACHE hit          (~60.0 ns) |   </pre></td></tr></table>
 </span><span class="lnt">4
 </span></pre></td>
 <td class="lntd">
-<pre class="chroma">Test case                                     Execution time
-Single thread                                300ms
+<pre class="chroma">Test case                            Execution time
+Single thread                             300ms
 Single thread with lock             10 000 ms
 Two thread with lock                 224 000ms</pre></td></tr></table>
 </div>
@@ -427,7 +428,6 @@ Two threads with CAS                             30 000 ms</pre></td></tr></tabl
 </span><span class="lnt">5
 </span><span class="lnt">6
 </span><span class="lnt">7
-</span><span class="lnt">8
 </span></pre></td>
 <td class="lntd">
 <pre class="chroma">public void simple() {
@@ -435,7 +435,6 @@ Two threads with CAS                             30 000 ms</pre></td></tr></tabl
   for (int i = 0; i &lt; MAX; i++) {
     counter++;
   }
-  
   System.out.println(&#34;counter=&#34; + counter);
 }</pre></td></tr></table>
 </div>
@@ -538,7 +537,7 @@ Two threads with CAS                             30 000 ms</pre></td></tr></tabl
 }</pre></td></tr></table>
 </div>
 </div>
-<p>我们再次运行 ,<code>MAX</code> 到1百万，看看能不能得到我们预期的输出 <code>counter = 1000000</code>:</p>
+<p>我们再次运行这个实现 直到<code>MAX</code> 到1百万，我们依然期望得到输出  <code>counter = 1000000</code>:</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre class="chroma"><span class="lnt">1
@@ -561,8 +560,7 @@ counter=999868
 counter=999770</pre></td></tr></table>
 </div>
 </div>
-<p>像我们看到的那样，由于内存屏障的介入，结果已经非常接近我们的预期了，然而，即使内存屏障也不足以阻止
-非原子操作的条件竞争。</p>
+<p>像我们看到的那样，由于内存屏障的介入，结果已经非常接近我们的预期了，然而，即使内存屏障也不足以阻止非原子操作的条件竞争。</p>
 
 <h3 id="传统队列">传统队列</h3>
 
@@ -572,7 +570,7 @@ counter=999770</pre></td></tr></table>
 
 <p>那意味着我们需要一些东西来处理线程间的通讯，在Java中，一种选择就是使用传统的<code>LinkedBlockingQueue</code>或者<code>ArrayBlockingQueue</code>。</p>
 
-<p>但是，队列也无法解决互斥和修改可见性在并发问题。</p>
+<p>即使队列能确保互斥和修改可见性但依然不能解决并发问题。</p>
 
 <p>我们看一下 <code>ArrayBlockingQueue</code> 的 <code>put</code>方法:</p>
 <div class="highlight"><div class="chroma">
@@ -636,8 +634,7 @@ private void enqueue(E x) {
 
 <p>如果队列处于满载而无法写入，结果生产者之间出现竞争，以至于导致上下文切换，缓存数据和指令丢失。</p>
 
-<p>而且，传统的队列系统，生产者操作队头的同时消费者操作队尾。如果队列为空，很可能队头，队尾，以及队列的容量都在
-同一个<code>缓存行</code>中，这将导致上面说的伪共享。</p>
+<p>而且，传统的队列系统，生产者操作队头的同时消费者操作队尾。如果队列为空，很可能队头，队尾，以及队列的容量都在同一个<code>缓存行</code>中，这将导致上面说的伪共享。</p>
 
 <h3 id="lmax-disruptor">LMAX Disruptor</h3>
 
@@ -647,7 +644,7 @@ private void enqueue(E x) {
 简而言之，开发人员在设计算法，数据结构时要懂得底层硬件。基于这个哲学，该团队才创造这个伟大的代码库。</p>
 
 <blockquote>
-<p>Disruptor 显著的降低了写竞争，更低的并发负载，更加缓存友好，实现了高吞吐量，低延迟。</p>
+<p>Disruptor 显著的降低了写竞争，更低的并发负载，缓存更加友好，实现了高吞吐量，低延迟。</p>
 
 <p>来源:<a href="https://lmax-exchange.github.io/disruptor/files/Disruptor-1.0.pdf">Disruptor technical paper</a></p>
 </blockquote>
@@ -687,7 +684,8 @@ private void enqueue(E x) {
 
 <p>事件实例在Disruptor中将会被重复利用，相比传统的队列会被垃圾回收器处理，事件会存活更长时间。</p>
 
-<p>在内部， ring buffer支持对象数组，据创造者说这是一个很好的选择。在硬件层级，数组有一个可预知的访问模式，元素可以预加载，所以事件处理器不用频繁的回到主存中加载下一个元素。这样我们就可以高效地遍历，而不像队列
+<p>在内部， ring buffer支持对象数组，据创造者说这是一个很好的选择。在硬件层级，数组有一个可预知的访问模式，
+元素可以预加载，所以事件处理器不用频繁的回到主存中加载下一个元素。这样，我们就可以高效地遍历，而不像队列
 那样通过链表的方式访问。</p>
 
 <p>可以像这样配置一个消费者:</p>
@@ -709,7 +707,7 @@ private void enqueue(E x) {
 <li>是否批量处理</li>
 </ul>
 
-<p>多生产者的情况下，他们都会收到每个事件，如果我们想分开加载，我们可以实现基于序列号的分片策略，像这样:</p>
+<p>多生产者的情况下，他们都会收到每个事件，如果我们像分开加载，我们可以实现基于序列号的分片策略，像这样:</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre class="chroma"><span class="lnt"> 1
@@ -749,7 +747,7 @@ private void enqueue(E x) {
 <pre class="chroma">RingBuffer&lt;MyEvent&gt; ringBuffer = disruptor.start();</pre></td></tr></table>
 </div>
 </div>
-<p>当Disruptor实例初始化完成后，我们就可以像下面这样发布事件了:</p>
+<p>当<code>Disruptor</code>实例被启动，我们就可以通过下面这样发布事件:</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre class="chroma"><span class="lnt">1
@@ -766,11 +764,11 @@ ringBuffer.publish(sequence); // Publish an event</pre></td></tr></table>
 </div>
 <p>序列号表示事件在ring buffer数据结构中的位置。</p>
 
-<p>当我们创建Disruptor实例的时候，我们同时传入了一个<code>producerType</code>变量(<code>ProducerType.SINGLE</code>或<code>ProducerType.MULTI</code>其中之一)，告诉Disruptor我们是单个生产者还是多个生产者。</p>
+<p>当我们创建<code>Disruptor</code>实例，我们同时要传入一个<code>producerType</code>变量(它是<code>ProducerType.SINGLE</code>或<code>ProducerType.MULTI</code>之一)。告诉<code>Disruptor</code>我们是否有单个还是多个生产者。</p>
 
-<p>在单个生产者的情况下，<code>ringBuffer.next()</code>方法完全是无锁的，如果是多个生产者，这个方法通过<code>CAS</code>操作从ring buffer中获取下一个可用的序列号。</p>
+<p>在单个生产者的情况下，<code>ringBuffer.next()</code>完全是一个无锁操作。另外一方面，如果我们有多个生产者，这个方法通过<code>CAS</code>操作从ring buffer中获取下一个序列号。</p>
 
-<p>序列号自身通过内存补全方式来确保在缓存行中不存在其他数据:</p>
+<p>序列号通过内存补全的方式确保在同一个缓存行中不包含其他数据:</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre class="chroma"><span class="lnt"> 1
@@ -799,24 +797,26 @@ class RhsPadding extends Value {
 }</pre></td></tr></table>
 </div>
 </div>
-<p>而且，当发布事件的时候，通过创建内存屏障来确保该事件缓存被更新。在ring buffer中添加事件不需要任何锁，所以大大提升了性能。</p>
+<p>而且，通过创建一个内存屏障，确保所有缓存得到发布事件的更新。在ring buffer中添加一个事件完全不需要锁，从而性能得到了大大提升。</p>
 
-<p>最后需要提到的是，我们说ring buffer底层是数组，对开发人员来说避免了事件在同一个缓存行中带来的伪共享问题。</p>
+<p>最后一点需要提到的，我们说ring buffer底层是一个数组，那意味着，开发人员阻止了同缓存行中的可能出现的伪共享问题。</p>
 
-<p>&hellip;&hellip;
-<strong><em>Disruptor开发小组将Disruptor与<code>ArrayBlockingQueue</code>做了性能对比，对比数据这里就不翻译了，肯定是Disruptor牛逼。</em></strong>
-&hellip;&hellip;</p>
+<p>我们看看Disruptor开发小组对Disruptor与<code>ArrayBlockingQueue</code>比较。</p>
+
+<p>测试中的吞吐性能ops/sec(P表示生产者，C表示消费者)</p>
+
+<p><strong><em>性能测试数据对比这里就不翻译了</em></strong></p>
 
 <blockquote>
-<p>原文地址:<a href="https://itnext.io/understanding-the-lmax-disruptor-caaaa2721496">https://itnext.io/understanding-the-lmax-disruptor-caaaa2721496</a></p>
+<p>原文地址: <a href="https://itnext.io/understanding-the-lmax-disruptor-caaaa2721496">https://itnext.io/understanding-the-lmax-disruptor-caaaa2721496</a></p>
 </blockquote>
 
 <hr />
 
-<h3 id="参考阅读">参考阅读</h3>
+<h3 id="扩展阅读">扩展阅读</h3>
 
 <ul>
-<li><a href="https://mirrors.edge.kernel.org/pub/linux/kernel/people/paulmck/perfbook/perfbook.html">pefbook</a></li>
+<li><a href="https://mirrors.edge.kernel.org/pub/linux/kernel/people/paulmck/perfbook/perfbook.html">perfbook</a></li>
 </ul>
 
 <h3 id="翻译后记">翻译后记</h3>
@@ -896,7 +896,7 @@ class RhsPadding extends Value {
       <i class="iconfont icon-heart"></i>
     </span>
     <p>
-    <span class="author">“来自山川湖海，却囿于昼夜，厨房与爱。”</span>
+    <span class="author">“来自山川湖海，却囿于昼夜，厨房与爱。”------万能青年旅店</span>
   </p>
   </span>
 </div>
