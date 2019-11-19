@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Categories on 独立，但不独行</title>
+    <link>server/categories/</link>
+    <description>Recent content in Categories on 独立，但不独行</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <copyright>“来自山川湖海，却囿于昼夜，厨房与爱。”------万能青年旅店</copyright>
+    
+	<atom:link href="server/categories/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Engineering</title>
+      <link>server/categories/engineering/</link>
+      <pubDate>Mon, 08 Aug 2016 01:24:47 +0000</pubDate>
+      
+      <guid>server/categories/engineering/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Marathon</title>
+      <link>server/categories/marathon/</link>
+      <pubDate>Sat, 18 Feb 2017 18:24:47 +0000</pubDate>
+      
+      <guid>server/categories/marathon/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Programming</title>
+      <link>server/categories/programming/</link>
+      <pubDate>Fri, 19 Apr 2019 21:24:47 +0000</pubDate>
+      
+      <guid>server/categories/programming/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Reading</title>
+      <link>server/categories/reading/</link>
+      <pubDate>Sun, 24 Feb 2019 18:24:47 +0000</pubDate>
+      
+      <guid>server/categories/reading/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Translate</title>
+      <link>server/categories/translate/</link>
+      <pubDate>Fri, 19 Apr 2019 21:24:47 +0000</pubDate>
+      
+      <guid>server/categories/translate/</guid>
+      <description></description>
+    </item>
+    
+  </channel>
+</rss>
