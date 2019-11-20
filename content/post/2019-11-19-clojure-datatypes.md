@@ -9,7 +9,6 @@ tags: ["Clojure"]
 [Clojure](http://clojure.org)作为一款基于JVM的LISP语言，我个人从创造者[Rich Hickey](https://twitter.com/richhickey)身上吸收了很多编程的观点，尽管作者提出了很多面向对象编程语言的缺陷，但单从语言本身来说，作者更希望通过JVM这个平台对寄主语言(Java)提供一种补充，只不过是通过LISP的方式。
 
 ## 封装与多态性
-
 封装和多态性是面向对象编程语言的两大特性，松本行弘认为
 
 > 面向对象的设计方法是在结构化编程对控制流程实现了结构化后，又加上了对数据的结构化
@@ -21,8 +20,7 @@ tags: ["Clojure"]
 Java利用类和接口虽然解决了很多设计问题，但是看上去还是不够优雅，比如类不能多继承，所以Clojure希望通过更彻底的方式来做到更高级的抽象。
 
 ## 认识Java的类
-
-在拥有了基本的数据结构(set,vector,list,map)之后，我们就可以依赖这些基础数据结构构建我们模型，通过组合的方式来表达业务领域，在Java中是这样的：
+在拥有了基本的[数据结构](https://clojure.org/reference/data_structures)([set](http://clojuredocs.org/clojure.core/set)，[vector](http://clojuredocs.org/clojure.core/vector)，[list](http://clojuredocs.org/clojure.core/list)，map)之后，我们就可以依赖这些基础数据结构构建我们模型，通过组合的方式来表达业务领域，在Java中是这样的：
 ```
 Class User {
     private String name;   //数据
@@ -36,15 +34,10 @@ Class User {
     }
 }
 ```
-但这个POJO将数据和行为交织在一起，如果在行为中没有任何业务逻辑，仅仅是暴露数据给外部，在领域驱动设计中这叫贫血对象，根据个人的经验，这样的贫血对象设计在很多Java系统都存在。
-
-## 数据与行为分离
-
-所以，Clojure提供更明确的方式，数据必须具有不可变性(函数式编程特性)，行为是在更搞层次抽象。Clojure提供了[deftype](http://clojuredocs.org/clojure.core/deftype)，[defrecord](http://clojuredocs.org/clojure.core/defrecord)，[reify](http://clojuredocs.org/clojure.core/reify), [defprotocol](http://clojuredocs.org/clojure.core/defprotocol)来实现这个目的，他们就是[Clojure的数据类型](https://clojure.org/reference/datatypes)。deftype可以理解为Java中的class，defprotocol对应Java中的interface，但在Clojure中他们具有更灵活的方式。
+但这个`POJO`将数据和行为交织在一起，如果在行为中没有任何业务逻辑，仅仅是暴露数据给外部，在领域驱动设计中这叫贫血对象，根据个人的经验，这样的贫血对象设计在很多Java系统都存在，同样的领域概念不能在系统中重用，想象一下，在社交系统中有User领域模型，电商系统中可能也包含一个User领域模型，但你不能重用两个系统之间完全相同的数据模型。
 
 ## defprotocol
-
-在Java里通过interface来定义规格，一个类可以实现多个interface，子类可以重写父类的方法来实现多态。但在Clojure里面我们不需要新增一个子类来实现多态。例如:
+在Java里通过interface来定义行为(和Clojure的`definterface`是完全一致的)，一个类可以实现多个interface，子类可以重写父类的方法来实现多态。Clojure提供的`defprotocol`,`extend`特性，可以不需要新增一个子类来实现多态。例如:
 ```
 (defprotocol Dateable
   (to-ms [t])) ;定义一个包含to-ms方法的接口
@@ -58,8 +51,10 @@ Class User {
 ```
 在Java中可以通过继承或者组合的方式实现对原有类的扩展，但是会显得很笨粗，Clojure避免了不必要的多层次封装/适配，在不修改原有类同时不新增类的基础上实现了真正的多态性。defprotocol 除了可以被deftype,defrecord,reify实现外，也可以被Java中的类实现。 
 
-## defrecord
+## 数据与行为分离
+所以，Clojure提供更明确的方式，数据必须具有不可变性(函数式编程特性)，行为是在更搞层次抽象。推荐将数据和行为分别定义，Clojure提供了[deftype](http://clojuredocs.org/clojure.core/deftype)，[defrecord](http://clojuredocs.org/clojure.core/defrecord)，[reify](http://clojuredocs.org/clojure.core/reify), [defprotocol](http://clojuredocs.org/clojure.core/defprotocol)来达到这个目的，他们就是[Clojure的数据类型](https://clojure.org/reference/datatypes)。`defrecord`用于映射你的数据记录，`deftype`可以理解为Java中的class，`defprotocol`定义行为。
 
+## defrecord
 defrecord在Clojure里面可以理解为是另外一种map变形方式,例如一个定义User领域模型的map为:
 ```
 (def user {"name" "xiebiao" , "age" 30})
@@ -73,9 +68,9 @@ defrecord在Clojure里面可以理解为是另外一种map变形方式,例如一
 (:name user )   ;获取user对象的name数据
 
 ```
-既然这样Clojure为什么还需要defrecord呢？这有两方面考虑，和defprotocol一样，需要和Java交互，因为Java是强类型的语言，另一方面，defrecord在应用领域设计中更能体现数据抽象。
+既然这样，Clojure为什么还需要defrecord呢？因为你除了可以获得具有map一样的数据操作特性外(包括数据解构)，还获得了类型驱动带来的多态特性，所以Clojure推荐将业务数据封装到defrecord中。
 
-defrecord 也可以实现defprotocol:
+`defrecord` 实现行为`defprotocol`:
 ```
 (defprotocol IA
   (say [this])) ;
@@ -86,7 +81,7 @@ IA
 
 (say (->User "xiebiao" 30) )
 ```
-也可以实现多个defprotocol:
+也可以实现多个`defprotocol`:
 ```
 (defprotocol IA
   (say [this])) ;
@@ -104,19 +99,19 @@ IB
 (say user )
 (talk user )
 ```
-上面的例子可以看出，通过实现defprotocol让数据具备行为，但数据本身不定义行为。
+上面的例子可以看出，通过实现defprotocol让数据具备行为，但数据本身独立于行为。
 ## deftype
-deftype具有类似的语法定义，但是deftype强调的是数据类型，Clojure利用类型分发来实现的多态性。
+deftype与defrecord具有类似的语法定义，也有很多功能上的相似之处， 但deftype相比较与defrecord提供了更丰富的功能，比如修改成员数据，当然类型多态行为才是重点。
 ```
 (deftype Circle [radius]) ;定义两个不通的类型
 (deftype Square [length width])
 
+;不同类型上定义相同的行为，类似Java中的重载，但不是通过子类继承的方式。
 (defmethod area Circle [c]
     (* Math/PI (* (.radius c) (.radius c))))
 (defmethod area Square [s]
     (* (.length s) (.width s)))
 
-;; create a couple shapes and get their area
 (def myCircle (Circle. 10))
 (def mySquare (Square. 5 11))
 
@@ -124,10 +119,11 @@ deftype具有类似的语法定义，但是deftype强调的是数据类型，Clo
 (area mySquare)
 
 ```
-当然Clojure通过defmulti 可以定义更灵活的分发规则，这里只是其中一个根据数据类型分发的例子。
+当然Clojure通过defmulti 还可以定义更灵活的分发规则，这里只是其中一个根据类型分发实现多态的例子。
+如果要问什么时候使用deftype，那就是当defrecord不能满足你的设计意图的时候。
 
 ## 为什么有defrecord和deftype?
-Clojure官方文档解释了为什么有defrecord和deftype,他们之间的异同，Clojure推荐将领域数据映射到defrecord中，一方面它的底层是不可变的map结构，属于基础的数据结构，以达到语言层面的重用。
+Clojure官方文档解释了为什么有defrecord和deftype，其中最大的区别就是，deftype允许你修改成员数据，但是不推荐你这样做。Clojure推荐将领域数据映射到defrecord中，一方面它的底层是不可变的map结构，属于基础的数据结构，以达到语言层面的重用。
 
 ## 最后
 Clojure虽然是一门LISP方言，LISP语言本身语法结构很简单，但是Clojure实现了纯粹的面向对象语言特性，特别是对当下面向对象编程语言的诟病，值得我们思考学习。
