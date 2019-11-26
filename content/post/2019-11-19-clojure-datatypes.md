@@ -37,7 +37,7 @@ Class User {
 但这个`POJO`将数据和行为交织在一起，如果在行为中没有任何业务逻辑，仅仅是暴露数据给外部，在领域驱动设计中这叫贫血对象，根据个人的经验，这样的贫血对象设计在很多Java系统都存在，同样的领域概念不能在系统中重用，想象一下，在社交系统中有User领域模型，电商系统中可能也包含一个User领域模型，但你不能重用两个系统之间完全相同的数据模型。
 
 ## defprotocol
-在Java里通过interface来定义行为(和Clojure的`definterface`是完全一致的)，一个类可以实现多个interface，子类可以重写父类的方法来实现多态。Clojure提供的`defprotocol`,`extend`特性，可以不需要新增一个子类来实现多态。例如:
+在Java里通过interface来定义行为(和Clojure的`definterface`是完全一致的)，一个类可以实现多个interface，子类可以重写父类的方法来实现多态。但是接口的问题是一旦被创建，就很难被扩展，Clojure的解决方案是协议`defprotocol`,它比接口更灵活，例如:
 ```
 (defprotocol Dateable
   (to-ms [t])) ;定义一个包含to-ms方法的接口
@@ -49,7 +49,7 @@ Class User {
 (to-ms (java.util.Date.))  ;java.util.Date具备了to-ms方法
 
 ```
-在Java中可以通过继承或者组合的方式实现对原有类的扩展，但是会显得很笨粗，Clojure避免了不必要的多层次封装/适配，在不修改原有类同时不新增类的基础上实现了真正的多态性。defprotocol 除了可以被deftype,defrecord,reify实现外，也可以被Java中的类实现。 
+在Java中可以通过继承或者组合的方式实现对原有类的扩展，但是会显得很笨粗，Clojure避免了不必要的多层次封装/适配，在不修改原有类同时不新增类的基础上实现了真正的多态性。`defprotocol` 除了可以被`deftype`,`defrecord`,`reify`实现外，也可以被Java中的类实现。 
 
 ## 数据与行为分离
 所以，Clojure提供更明确的方式，数据必须具有不可变性(函数式编程特性)，行为是在更搞层次抽象。推荐将数据和行为分别定义，Clojure提供了[deftype](http://clojuredocs.org/clojure.core/deftype)，[defrecord](http://clojuredocs.org/clojure.core/defrecord)，[reify](http://clojuredocs.org/clojure.core/reify), [defprotocol](http://clojuredocs.org/clojure.core/defprotocol)来达到这个目的，他们就是[Clojure的数据类型](https://clojure.org/reference/datatypes)。`defrecord`用于映射你的数据记录，`deftype`可以理解为Java中的class，`defprotocol`定义行为。
