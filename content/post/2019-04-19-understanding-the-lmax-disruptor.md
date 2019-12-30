@@ -12,7 +12,7 @@ tags: ["Disruptor"]
 
 由于个人英文水平有限，更多是意译。
 
----
+------ 我是分割线 ------
 
 [LMAX Disruptor](https://github.com/LMAX-Exchange/disruptor) 是由一家金融交易平台公司[LMAX Exchange](https://www.lmax.com/)开源的Java包,它为线程间的通信问题提供了极其优雅，高效的解决方案。
 
@@ -443,7 +443,7 @@ class RhsPadding extends Value {
 
 >  原文地址: [https://itnext.io/understanding-the-lmax-disruptor-caaaa2721496](https://itnext.io/understanding-the-lmax-disruptor-caaaa2721496) 
 
-------
+------ 我是分割线 ------
 
 ### 扩展阅读
 
