@@ -5,7 +5,7 @@
 // ========== Theme Color ========== //
 // Config here to change theme color
 // Default | Mint Green | Cobalt Blue | Hot Pink | Dark Violet
-$theme-color-config: 'Cobalt Blue';
+$theme-color-config: 'Default';
 
 // Default theme color map
 $theme-color-map: (
@@ -252,7 +252,8 @@ $code-type-list: (
   language-typescript: "TypeScript",
   language-yml: "YAML",
   language-yaml: "YAML",
-  language-toml: "TOML"
+  language-toml: "TOML",
+  language-diff: "Diff"
 ) !default;
 
 // Color of the code background.
