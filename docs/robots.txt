@@ -1,2 +1,2 @@
 User-agent: *
-Sitemap: server/sitemap.xml
+Sitemap: http://blog.xiebiao.com/sitemap.xml

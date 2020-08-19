@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Career on 独立，但不独行</title>
+    <link>http://blog.xiebiao.com/categories/career/</link>
+    <description>Recent content in Career on 独立，但不独行</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <copyright>来自山川湖海，却囿于昼夜，厨房与爱。------万能青年旅店</copyright>
+    <lastBuildDate>Sat, 28 Dec 2019 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="http://blog.xiebiao.com/categories/career/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>技术招聘</title>
+      <link>http://blog.xiebiao.com/post/2019-12-28-heuristics-for-hiring/</link>
+      <pubDate>Sat, 28 Dec 2019 00:00:00 +0000</pubDate>
+      
+      <guid>http://blog.xiebiao.com/post/2019-12-28-heuristics-for-hiring/</guid>
+      <description>国外一家自由职业招聘平台 Gun.io ，最近针对问题“当招聘高级工程师时最看中哪些方面？”，采访了38名CTO， 最后出了一份报告。 出色工程师的基因 任何技</description>
+    </item>
+    
+  </channel>
+</rss>

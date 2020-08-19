@@ -1,17 +1,17 @@
 ---
 layout: post
-title:  多内核平台上的锁
+title:  计算机多内核平台上的锁(一)
 date:   2020-08-19
 categories: ["Programming"]
 tags: ["Concurrency"]
 ---
 如何在高并发的情况下，提高多核CPU的性能，一直是在并发编程领域中非常重要的问题。
-特别是随着云厂商按计算收费的当下，如何有效地利用资源变得更重要。
+特别是随着云厂商按计算收费的当下，如何有效地利用计算资源变得更重要。
 
-> 致富的途径只有两种：一种是拼命赚钱，另外一种就是节约花钱。
+> 致富的途径只有两种：一种是拼命赚钱，另外一种就是有钱后节约花钱。
 
 ## 什么是锁
-在计算机硬件层是没有`锁`这个概念的，计算机领域中操作系统的`锁`来源于现实生活中的锁，它的作用是保护某种资源同一时间不能被多人访问。现代计算机都是多核CPU处理器，我们需要通过锁机制来协调多个内核对资源的访问操作。
+在计算机硬件层其实是没有`锁`这个概念的，计算机领域中的`锁`来源于现实生活中的锁，它的作用是保护某种资源同一时间不能被多人访问。现代计算机已经发展成了多核CPU处理器，我们需要通过锁机制来协调多个内核对资源的访问操作。
 
 和现实中一样，在给资源上锁的时候，我们可能需要几个步骤：
 1. 拿出钥匙
@@ -71,18 +71,18 @@ do{
 早期的CPU架构基本上都采用SMP(Symmetric Multi-Processor)，这种对称多处理器结构，多个CPU内核共享内存资源，除了内存速度访问慢以外，
 还可能导致访问冲突。
 
-现代CPU为了提高数据的访问速度，采用了NUMA(Non-Uniform Memory Access)多级缓存的架构，如下图:
+现代CPU为了提高数据的访问速度，采用了NUMA(Non-Uniform Memory Access)多级缓存的架构，每个内核都有自己的缓存，如下图:
 
 ![CPU多级缓存](http://blog.xiebiao.com/images/2020-08-19-locks-on-multicore/CPU_Cache.png "")
 
-由于内存读取速度的较慢(科技发展遇到了阻碍?)，但是CPU读取速度提升较快，所以CPU厂商就在内存和CPU之间加了多级缓存来提高性能。
+由于内存读取速度的较慢(科技发展遇到了阻碍?)，但是CPU读取速度提升较快，所以CPU厂商才在内存和CPU之间加了多级缓存来缓解速度的不对等，充分利用CPU。
 
-![访问速度与容量对比](http://blog.xiebiao.com/images/2020-08-19-locks-on-multicore/CPU_Cache.png "图片来源于网络，请联系删除")
+![访问速度与容量对比](http://blog.xiebiao.com/images/2020-08-19-locks-on-multicore/CPU_Cache_Access.png "图片来源于网络，请联系删除")
 
 内核首先从L1缓存中读取数据，如果没有就到L2缓存中读取，如果没有就到
 L3缓存中去读取，最坏的情况就是L3缓存也没有，那就只能到内存中去读取。
 
-但这种方案也不是没有弊端，因为越是靠近内核的缓存越贵，不能肆意地设计得很大。
+但这种方案也不是没有限制，因为越是靠近内核的缓存越贵，不能肆意地设计得很大。
 
 更详细的内存架构介绍，建议阅读:[圖解RAM結構與原理，系統記憶體的Channel、Chip與Bank](https://www.techbang.com/posts/18381-from-the-channel-to-address-computer-main-memory-structures-to-understand?page=2)
 
@@ -94,11 +94,12 @@ while(test_and_set(*lock));
 ```
 这就是自旋锁，自旋锁的原理是，如果锁被别的执行单元保持，那么调用者就一直循环在那里查看锁保持者是否释放了锁，即忙则等待。
 
-这里有个细节就是等待的调用者并不是休眠，而是一直在工作占用CPU。
+这里有个细节就是等待锁的调用者并不是休眠，而是一直在工作占用CPU。
 
 结合上面提到的多核多级CPU缓存，如果当多个内核执行单元都在调用获取锁时，没有获取到锁的内核将一直繁忙，处于中断状态。
 
 所以这种自旋锁的缺点就是:
+
 1. 容易导致死锁
 2. 过度消耗CPU资源
 3. 竞争不具备公平性
@@ -164,7 +165,9 @@ public class CLHLock {
 
 CLH自旋锁的优点是空间复杂度低，L个线程n个锁的复杂度为O（L+n）
 
-JAVA并发框架中(`java.util.concurrent.locks.AbstractQueuedSynchronizer.Node`)也是基于CLH锁。
+JAVA中的AQS并发框架(`java.util.concurrent.locks.AbstractQueuedSynchronizer.Node`)也是基于CLH锁，但是它是一个变种，它考虑了等待队列中取消获取锁的情况。
+
+JDK中的描述:
 
 ``` JAVA
     /**
@@ -201,6 +204,7 @@ JAVA并发框架中(`java.util.concurrent.locks.AbstractQueuedSynchronizer.Node`
 MCS锁对CLH锁进行了优化，自旋发生在本地节点上。
 
 实现如下:
+
 1. 队列初始化时没有结点，tail=null
 2. 线程A想要获取锁，于是将自己置于队尾，由于它是第一个结点，它的locked域为false
 3. 线程B和C相继加入队列，a->next=b,b->next=c。且B和C现在没有获取锁，处于等待状态，所以它们的locked域为true，
@@ -249,4 +253,4 @@ public class MCSLock  {
 
 [*Locks on Multicore and Multisocket Platforms*](http://https://www.cs.rice.edu/~johnmc/comp522/lecture-notes/COMP522-2019-LocksOnMulticore.pdf)
 
-[https://www.cnblogs.com/yuyutianxia/p/4296220.html](https://www.cnblogs.com/yuyutianxia/p/4296220.html)
+[*https://www.cnblogs.com/yuyutianxia/p/4296220.html*](https://www.cnblogs.com/yuyutianxia/p/4296220.html)

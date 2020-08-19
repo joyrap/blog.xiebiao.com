@@ -1,156 +1,207 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
-<?xml-stylesheet type="text/xsl" href="server/sitemap.xsl"?>
+<?xml-stylesheet type="text/xsl" href="http://blog.xiebiao.com/sitemap.xsl"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
-    <loc>server/about/</loc>
+    <loc>http://blog.xiebiao.com/about/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
-    <loc>server/post/2019-04-19-understanding-the-lmax-disruptor/</loc>
+    <loc>http://blog.xiebiao.com/categories/</loc>
+    <lastmod>2020-08-19T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://blog.xiebiao.com/tags/concurrency/</loc>
+    <lastmod>2020-08-19T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://blog.xiebiao.com/post/</loc>
+    <lastmod>2020-08-19T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://blog.xiebiao.com/categories/programming/</loc>
+    <lastmod>2020-08-19T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://blog.xiebiao.com/tags/</loc>
+    <lastmod>2020-08-19T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://blog.xiebiao.com/</loc>
+    <lastmod>2020-08-19T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://blog.xiebiao.com/post/2020-08-19-locks-on-multicore/</loc>
+    <lastmod>2020-08-19T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>http://blog.xiebiao.com/tags/test/</loc>
+    <lastmod>2020-01-21T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://blog.xiebiao.com/post/2020-01-21-untestable-code/</loc>
+    <lastmod>2020-01-21T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>http://blog.xiebiao.com/categories/career/</loc>
+    <lastmod>2019-12-28T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://blog.xiebiao.com/post/2019-12-28-heuristics-for-hiring/</loc>
+    <lastmod>2019-12-28T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>http://blog.xiebiao.com/post/2019-12-25-2019-read-books/</loc>
+    <lastmod>2019-12-25T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>http://blog.xiebiao.com/categories/reading/</loc>
+    <lastmod>2019-12-25T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://blog.xiebiao.com/categories/life/</loc>
+    <lastmod>2019-12-05T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://blog.xiebiao.com/post/2019-12-05-follow-your-heart/</loc>
+    <lastmod>2019-12-05T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>http://blog.xiebiao.com/tags/%E8%AF%97%E4%B8%8E%E8%BF%9C%E6%96%B9/</loc>
+    <lastmod>2019-12-05T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://blog.xiebiao.com/tags/clojure/</loc>
+    <lastmod>2019-11-19T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://blog.xiebiao.com/post/2019-11-19-clojure-datatypes/</loc>
+    <lastmod>2019-11-19T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>http://blog.xiebiao.com/tags/disruptor/</loc>
+    <lastmod>2019-04-19T21:24:47+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://blog.xiebiao.com/categories/translate/</loc>
+    <lastmod>2019-04-19T21:24:47+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://blog.xiebiao.com/post/2019-04-19-understanding-the-lmax-disruptor/</loc>
     <lastmod>2019-04-19T21:24:47+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
-    <loc>server/post/2019-02-24-how-will-you-measure-your-life/</loc>
+    <loc>http://blog.xiebiao.com/post/2019-02-24-how-will-you-measure-your-life/</loc>
     <lastmod>2019-02-24T18:24:47+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
-    <loc>server/post/2017-02-18-how-to-run-half-marathons/</loc>
+    <loc>http://blog.xiebiao.com/categories/marathon/</loc>
+    <lastmod>2017-02-18T18:24:47+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://blog.xiebiao.com/post/2017-02-18-how-to-run-half-marathons/</loc>
     <lastmod>2017-02-18T18:24:47+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
-    <loc>server/post/2017-02-04-how-to-encrypt-by-linux-command/</loc>
+    <loc>http://blog.xiebiao.com/tags/security/</loc>
+    <lastmod>2017-02-04T18:24:47+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://blog.xiebiao.com/post/2017-02-04-how-to-encrypt-by-linux-command/</loc>
     <lastmod>2017-02-04T18:24:47+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
-    <loc>server/post/2017-01-15-java-multidimensional-arrays/</loc>
-    <lastmod>2017-01-15T20:24:47+00:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
+    <loc>http://blog.xiebiao.com/categories/engineering/</loc>
+    <lastmod>2016-08-08T01:24:47+00:00</lastmod>
+    <priority>0</priority>
   </url>
   
   <url>
-    <loc>server/post/2016-08-08-how-to-make-projects-failed/</loc>
+    <loc>http://blog.xiebiao.com/tags/project/</loc>
+    <lastmod>2016-08-08T01:24:47+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://blog.xiebiao.com/post/2016-08-08-how-to-make-projects-failed/</loc>
     <lastmod>2016-08-08T01:24:47+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
-    <loc>server/post/2012-06-20-notification-pattern/</loc>
+    <loc>http://blog.xiebiao.com/post/2012-06-20-notification-pattern/</loc>
     <lastmod>2012-06-20T11:24:47+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
-    <loc>server/categories/</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>server/tags/disruptor/</loc>
-    <lastmod>2019-04-19T21:24:47+00:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>server/categories/engineering/</loc>
-    <lastmod>2016-08-08T01:24:47+00:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>server/tags/java/</loc>
-    <lastmod>2017-01-15T20:24:47+00:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>server/categories/marathon/</loc>
-    <lastmod>2017-02-18T18:24:47+00:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>server/tags/pattern/</loc>
+    <loc>http://blog.xiebiao.com/tags/pattern/</loc>
     <lastmod>2012-06-20T11:24:47+00:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>server/post/</loc>
-    <lastmod>2019-04-19T21:24:47+00:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>server/categories/programming/</loc>
-    <lastmod>2019-04-19T21:24:47+00:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>server/tags/project/</loc>
-    <lastmod>2016-08-08T01:24:47+00:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>server/categories/reading/</loc>
-    <lastmod>2019-02-24T18:24:47+00:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>server/tags/</loc>
-    <lastmod>2019-04-19T21:24:47+00:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>server/categories/translate/</loc>
-    <lastmod>2019-04-19T21:24:47+00:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>server/tags/security/</loc>
-    <lastmod>2017-02-04T18:24:47+00:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>server/</loc>
-    <lastmod>2019-04-19T21:24:47+00:00</lastmod>
-    <changefreq>weekly</changefreq>
     <priority>0</priority>
   </url>
   

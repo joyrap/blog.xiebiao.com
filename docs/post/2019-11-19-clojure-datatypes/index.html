@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>Clojure中的数据类型 - 独立，但不独行</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="Bill Xie" /><meta name="description" content="Clojure作为一款基于JVM的LISP语言，我个人从创造者Rich Hickey身上吸收了很多编程的观点，尽管作者提出了很多面向对象编程语" /><meta name="keywords" content="Hugo, theme, even" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.55.5 with theme even" />
+
+
+<link rel="canonical" href="http://blog.xiebiao.com/post/2019-11-19-clojure-datatypes/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+<link href="/dist/even.c2a46f00.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
+
+
+<meta property="og:title" content="Clojure中的数据类型" />
+<meta property="og:description" content="Clojure作为一款基于JVM的LISP语言，我个人从创造者Rich Hickey身上吸收了很多编程的观点，尽管作者提出了很多面向对象编程语" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://blog.xiebiao.com/post/2019-11-19-clojure-datatypes/" />
+<meta property="article:published_time" content="2019-11-19T00:00:00&#43;00:00"/>
+<meta property="article:modified_time" content="2019-11-19T00:00:00&#43;00:00"/>
+
+<meta itemprop="name" content="Clojure中的数据类型">
+<meta itemprop="description" content="Clojure作为一款基于JVM的LISP语言，我个人从创造者Rich Hickey身上吸收了很多编程的观点，尽管作者提出了很多面向对象编程语">
+
+
+<meta itemprop="datePublished" content="2019-11-19T00:00:00&#43;00:00" />
+<meta itemprop="dateModified" content="2019-11-19T00:00:00&#43;00:00" />
+<meta itemprop="wordCount" content="2191">
+
+
+
+<meta itemprop="keywords" content="Clojure," />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Clojure中的数据类型"/>
+<meta name="twitter:description" content="Clojure作为一款基于JVM的LISP语言，我个人从创造者Rich Hickey身上吸收了很多编程的观点，尽管作者提出了很多面向对象编程语"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">独立，但不独行</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">Categories</li>
+      </a><a href="/about/">
+        <li class="mobile-menu-item">About</li>
+      </a>
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">独立，但不独行</a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">Categories</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/about/">About</a>
+      </li>
+  </ul>
+</nav>
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">Clojure中的数据类型</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2019-11-19 </span>
+        <div class="post-category">
+            <a href="/categories/programming/"> Programming </a>
+            </div>
+          <span class="more-meta"> 2191 words </span>
+          <span class="more-meta"> 5 mins read </span>
+        
+      </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">Contents</h2>
+  <div class="post-toc-content always-active">
+    <nav id="TableOfContents">
+<ul>
+<li>
+<ul>
+<li><a href="#封装与多态性">封装与多态性</a></li>
+<li><a href="#认识java的类">认识Java的类</a></li>
+<li><a href="#defprotocol">defprotocol</a></li>
+<li><a href="#数据与行为分离">数据与行为分离</a></li>
+<li><a href="#defrecord">defrecord</a></li>
+<li><a href="#deftype">deftype</a></li>
+<li><a href="#为什么有defrecord和deftype">为什么有defrecord和deftype?</a></li>
+<li><a href="#最后">最后</a></li>
+</ul></li>
+</ul>
+</nav>
+  </div>
+</div>
+    <div class="post-content">
+      
+
+<p><a href="http://clojure.org">Clojure</a>作为一款基于JVM的LISP语言，我个人从创造者<a href="https://twitter.com/richhickey">Rich Hickey</a>身上吸收了很多编程的观点，尽管作者提出了很多面向对象编程语言的缺陷，但单从语言本身来说，作者更希望通过JVM这个平台对寄主语言(Java)提供一种补充，只不过是通过LISP的方式。</p>
+
+<h2 id="封装与多态性">封装与多态性</h2>
+
+<p>封装和多态性是面向对象编程语言的两大特性，松本行弘认为</p>
+
+<blockquote>
+<p>面向对象的设计方法是在结构化编程对控制流程实现了结构化后，又加上了对数据的结构化</p>
+
+<ul>
+<li>不需要知道内部的详细处理就可以进行操作(封装，数据抽象)</li>
+<li>根据不通的数据类型自动选择适当的方法(多态性)</li>
+</ul>
+</blockquote>
+
+<p>Java利用类和接口虽然解决了很多设计问题，但是看上去还是不够优雅，比如类不能多继承，所以Clojure希望通过更彻底的方式来做到更高级的抽象。</p>
+
+<h2 id="认识java的类">认识Java的类</h2>
+
+<p>在拥有了基本的<a href="https://clojure.org/reference/data_structures">数据结构</a>(<a href="http://clojuredocs.org/clojure.core/set">set</a>，<a href="http://clojuredocs.org/clojure.core/vector">vector</a>，<a href="http://clojuredocs.org/clojure.core/list">list</a>，map)之后，我们就可以依赖这些基础数据结构构建我们模型，通过组合的方式来表达业务领域，在Java中是这样的：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">Class User {
+    private String name;   //数据
+    private int age;       //数据
+    ....
+    public String getName(){ //行为
+        ....
+    }
+    public void setName(String name){ //行为
+        ....
+    }
+}</pre></td></tr></table>
+</div>
+</div>
+<p>但这个<code>POJO</code>将数据和行为交织在一起，如果在行为中没有任何业务逻辑，仅仅是暴露数据给外部，在领域驱动设计中这叫贫血对象，根据个人的经验，这样的贫血对象设计在很多Java系统都存在，同样的领域概念不能在系统中重用，想象一下，在社交系统中有User领域模型，电商系统中可能也包含一个User领域模型，但你不能重用两个系统之间完全相同的数据模型。</p>
+
+<h2 id="defprotocol">defprotocol</h2>
+
+<p>在Java里通过interface来定义行为(和Clojure的<code>definterface</code>是完全一致的)，一个类可以实现多个interface，子类可以重写父类的方法来实现多态。但是接口的问题是一旦被创建，就很难被扩展，Clojure的解决方案是协议<code>defprotocol</code>,它比接口更灵活，例如:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">(defprotocol Dateable
+  (to-ms [t])) ;定义一个包含to-ms方法的接口
+
+(extend java.util.Date
+  Dateable
+  {:to-ms #(.getTime %)})    ;java.util.Date实现了这个接口
+
+(to-ms (java.util.Date.))  ;java.util.Date具备了to-ms方法</pre></td></tr></table>
+</div>
+</div>
+<p>在Java中可以通过继承或者组合的方式实现对原有类的扩展，但是会显得很笨粗，Clojure避免了不必要的多层次封装/适配，在不修改原有类同时不新增类的基础上实现了真正的多态性。<code>defprotocol</code> 除了可以被<code>deftype</code>,<code>defrecord</code>,<code>reify</code>实现外，也可以被Java中的类实现。</p>
+
+<h2 id="数据与行为分离">数据与行为分离</h2>
+
+<p>所以，Clojure提供更明确的方式，数据必须具有不可变性(函数式编程特性)，行为是在更搞层次抽象。推荐将数据和行为分别定义，Clojure提供了<a href="http://clojuredocs.org/clojure.core/deftype">deftype</a>，<a href="http://clojuredocs.org/clojure.core/defrecord">defrecord</a>，<a href="http://clojuredocs.org/clojure.core/reify">reify</a>, <a href="http://clojuredocs.org/clojure.core/defprotocol">defprotocol</a>来达到这个目的，他们就是<a href="https://clojure.org/reference/datatypes">Clojure的数据类型</a>。<code>defrecord</code>用于映射你的数据记录，<code>deftype</code>可以理解为Java中的class，<code>defprotocol</code>定义行为。</p>
+
+<h2 id="defrecord">defrecord</h2>
+
+<p>defrecord在Clojure里面可以理解为是另外一种map变形方式,例如一个定义User领域模型的map为:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span><span class="lnt">2
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">(def user {&#34;name&#34; &#34;xiebiao&#34; , &#34;age&#34; 30})
+(:name user)</pre></td></tr></table>
+</div>
+</div>
+<p>用defrecord来表达:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">(defrecord User [name age])  ;对应Java的Class User
+(def user (-&gt;User &#34;xiebiao&#34; 30)) ;创建一个user对象
+(:name user )   ;获取user对象的name数据</pre></td></tr></table>
+</div>
+</div>
+<p>既然这样，Clojure为什么还需要defrecord呢？因为你除了可以获得具有map一样的数据操作特性外(包括数据解构)，还获得了类型驱动带来的多态特性，所以Clojure推荐将业务数据封装到defrecord中。</p>
+
+<p><code>defrecord</code> 实现行为<code>defprotocol</code>:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">(defprotocol IA
+  (say [this])) ;
+
+(defrecord User [name age]
+IA
+(say [this] (println (:name this))))
+
+(say (-&gt;User &#34;xiebiao&#34; 30) )</pre></td></tr></table>
+</div>
+</div>
+<p>也可以实现多个<code>defprotocol</code>:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">(defprotocol IA
+  (say [this])) ;
+(defprotocol IB
+  (talk [this])) 
+
+(defrecord User [name age]
+IA
+(say [this] (println (:name this)))
+IB
+(talk [this] (println (:name this)))
+)
+
+(def user (-&gt;User &#34;xiebiao&#34; 30) )
+(say user )
+(talk user )</pre></td></tr></table>
+</div>
+</div>
+<p>上面的例子可以看出，通过实现defprotocol让数据具备行为，但数据本身独立于行为。</p>
+
+<h2 id="deftype">deftype</h2>
+
+<p>deftype与defrecord具有类似的语法定义，也有很多功能上的相似之处， 但deftype相比较与defrecord提供了更丰富的功能，比如修改成员数据，当然类型多态行为才是重点。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">(deftype Circle [radius]) ;定义两个不通的类型
+(deftype Square [length width])
+
+;不同类型上定义相同的行为，类似Java中的重载，但不是通过子类继承的方式。
+(defmethod area Circle [c]
+    (* Math/PI (* (.radius c) (.radius c))))
+(defmethod area Square [s]
+    (* (.length s) (.width s)))
+
+(def myCircle (Circle. 10))
+(def mySquare (Square. 5 11))
+
+(area myCircle); area方法会根据参数的类型决定调用哪个方法。
+(area mySquare)</pre></td></tr></table>
+</div>
+</div>
+<p>当然Clojure通过defmulti 还可以定义更灵活的分发规则，这里只是其中一个根据类型分发实现多态的例子。
+如果要问什么时候使用deftype，那就是当defrecord不能满足你的设计意图的时候。</p>
+
+<h2 id="为什么有defrecord和deftype">为什么有defrecord和deftype?</h2>
+
+<p>Clojure官方文档解释了为什么有defrecord和deftype，其中最大的区别就是，deftype允许你修改成员数据，但是不推荐你这样做。Clojure推荐将领域数据映射到defrecord中，一方面它的底层是不可变的map结构，属于基础的数据结构，以达到语言层面的重用。</p>
+
+<h2 id="最后">最后</h2>
+
+<p>Clojure虽然是一门LISP方言，LISP语言本身语法结构很简单，但是Clojure实现了纯粹的面向对象语言特性，特别是对当下面向对象编程语言的诟病，值得我们思考学习。</p>
+
+    </div>
+
+    <div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">Author</span>
+    <span class="item-content">Bill Xie</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">LastMod</span>
+    <span class="item-content">
+        2019-11-19
+        
+    </span>
+  </p>
+  
+  
+</div>
+<footer class="post-footer">
+      <div class="post-tags">
+          <a href="/tags/clojure/">Clojure</a>
+          </div>
+      <nav class="post-nav">
+        <a class="prev" href="/post/2019-12-05-follow-your-heart/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">执命向西的人</span>
+            <span class="prev-text nav-mobile">Prev</span>
+          </a>
+        <a class="next" href="/post/2019-04-19-understanding-the-lmax-disruptor/">
+            <span class="next-text nav-default">翻译:Understanding the LMAX Disruptor</span>
+            <span class="next-text nav-mobile">Next</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        
+
+  
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="https://stackoverflow.com/users/1130203/bill-xie" class="iconfont icon-stack-overflow" title="stack-overflow"></a>
+      <a href="https://twitter.com/joyrap" class="iconfont icon-twitter" title="twitter"></a>
+      <a href="https://github.com/xiebiao" class="iconfont icon-github" title="github"></a>
+  <a href="http://blog.xiebiao.com/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" href="https://gohugo.io">Hugo</a>
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    Theme - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    2012 - 
+    2020
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">来自山川湖海，却囿于昼夜，厨房与爱。------万能青年旅店</span>
+  </span>
+</div>
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
+<script type="text/javascript" src="/dist/even.26188efa.min.js"></script>
+
+
+
+
+
+
+
+
+</body>
+</html>

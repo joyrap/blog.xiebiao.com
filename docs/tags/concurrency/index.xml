@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Concurrency on 独立，但不独行</title>
+    <link>http://blog.xiebiao.com/tags/concurrency/</link>
+    <description>Recent content in Concurrency on 独立，但不独行</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <copyright>来自山川湖海，却囿于昼夜，厨房与爱。------万能青年旅店</copyright>
+    <lastBuildDate>Wed, 19 Aug 2020 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="http://blog.xiebiao.com/tags/concurrency/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>计算机多内核平台上的锁(一)</title>
+      <link>http://blog.xiebiao.com/post/2020-08-19-locks-on-multicore/</link>
+      <pubDate>Wed, 19 Aug 2020 00:00:00 +0000</pubDate>
+      
+      <guid>http://blog.xiebiao.com/post/2020-08-19-locks-on-multicore/</guid>
+      <description>如何在高并发的情况下，提高多核CPU的性能，一直是在并发编程领域中非常重要的问题。 特别是随着云厂商按计算收费的当下，如何有效地利用计算资源变</description>
+    </item>
+    
+  </channel>
+</rss>

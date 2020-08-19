@@ -2,22 +2,31 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Reading on 独立，但不独行</title>
-    <link>server/categories/reading/</link>
+    <link>http://blog.xiebiao.com/categories/reading/</link>
     <description>Recent content in Reading on 独立，但不独行</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <copyright>“来自山川湖海，却囿于昼夜，厨房与爱。”------万能青年旅店</copyright>
-    <lastBuildDate>Sun, 24 Feb 2019 18:24:47 +0000</lastBuildDate>
+    <copyright>来自山川湖海，却囿于昼夜，厨房与爱。------万能青年旅店</copyright>
+    <lastBuildDate>Wed, 25 Dec 2019 00:00:00 +0000</lastBuildDate>
     
-	<atom:link href="server/categories/reading/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="http://blog.xiebiao.com/categories/reading/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
+      <title>2019阅读清单</title>
+      <link>http://blog.xiebiao.com/post/2019-12-25-2019-read-books/</link>
+      <pubDate>Wed, 25 Dec 2019 00:00:00 +0000</pubDate>
+      
+      <guid>http://blog.xiebiao.com/post/2019-12-25-2019-read-books/</guid>
+      <description>人们经常说这个时代物欲横流，信息爆炸，有人自带优越感，有人贩卖焦虑&amp;hellip;&amp;hellip; 但无论如何，这都不是你看到的那个世界，唯有</description>
+    </item>
+    
+    <item>
       <title>读书:How Will You Measure Your Life?</title>
-      <link>server/post/2019-02-24-how-will-you-measure-your-life/</link>
+      <link>http://blog.xiebiao.com/post/2019-02-24-how-will-you-measure-your-life/</link>
       <pubDate>Sun, 24 Feb 2019 18:24:47 +0000</pubDate>
       
-      <guid>server/post/2019-02-24-how-will-you-measure-your-life/</guid>
+      <guid>http://blog.xiebiao.com/post/2019-02-24-how-will-you-measure-your-life/</guid>
       <description>在读到《How Will You Measure Your Life? 》 这本书之前，是看到一篇辞去亚马逊年薪500万工作的文章，大概是讲随着工作中升职，加薪，工作激情却在逐渐降低，于是就</description>
     </item>
     

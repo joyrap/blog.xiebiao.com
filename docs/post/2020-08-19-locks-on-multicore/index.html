@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>计算机多内核平台上的锁(一) - 独立，但不独行</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="Bill Xie" /><meta name="description" content="如何在高并发的情况下，提高多核CPU的性能，一直是在并发编程领域中非常重要的问题。 特别是随着云厂商按计算收费的当下，如何有效地利用计算资源变" /><meta name="keywords" content="Hugo, theme, even" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.55.5 with theme even" />
+
+
+<link rel="canonical" href="http://blog.xiebiao.com/post/2020-08-19-locks-on-multicore/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+<link href="/dist/even.c2a46f00.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
+
+
+<meta property="og:title" content="计算机多内核平台上的锁(一)" />
+<meta property="og:description" content="如何在高并发的情况下，提高多核CPU的性能，一直是在并发编程领域中非常重要的问题。 特别是随着云厂商按计算收费的当下，如何有效地利用计算资源变" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://blog.xiebiao.com/post/2020-08-19-locks-on-multicore/" />
+<meta property="article:published_time" content="2020-08-19T00:00:00&#43;00:00"/>
+<meta property="article:modified_time" content="2020-08-19T00:00:00&#43;00:00"/>
+
+<meta itemprop="name" content="计算机多内核平台上的锁(一)">
+<meta itemprop="description" content="如何在高并发的情况下，提高多核CPU的性能，一直是在并发编程领域中非常重要的问题。 特别是随着云厂商按计算收费的当下，如何有效地利用计算资源变">
+
+
+<meta itemprop="datePublished" content="2020-08-19T00:00:00&#43;00:00" />
+<meta itemprop="dateModified" content="2020-08-19T00:00:00&#43;00:00" />
+<meta itemprop="wordCount" content="2682">
+
+
+
+<meta itemprop="keywords" content="Concurrency," />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="计算机多内核平台上的锁(一)"/>
+<meta name="twitter:description" content="如何在高并发的情况下，提高多核CPU的性能，一直是在并发编程领域中非常重要的问题。 特别是随着云厂商按计算收费的当下，如何有效地利用计算资源变"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">独立，但不独行</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">Categories</li>
+      </a><a href="/about/">
+        <li class="mobile-menu-item">About</li>
+      </a>
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">独立，但不独行</a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">Categories</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/about/">About</a>
+      </li>
+  </ul>
+</nav>
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">计算机多内核平台上的锁(一)</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2020-08-19 </span>
+        <div class="post-category">
+            <a href="/categories/programming/"> Programming </a>
+            </div>
+          <span class="more-meta"> 2682 words </span>
+          <span class="more-meta"> 6 mins read </span>
+        
+      </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">Contents</h2>
+  <div class="post-toc-content always-active">
+    <nav id="TableOfContents">
+<ul>
+<li>
+<ul>
+<li><a href="#什么是锁">什么是锁</a></li>
+<li><a href="#多核cpu多级缓存架构">多核CPU多级缓存架构</a></li>
+<li><a href="#自旋锁">自旋锁</a>
+<ul>
+<li><a href="#clh锁">CLH锁</a></li>
+<li><a href="#mcs锁">MCS锁</a></li>
+</ul></li>
+<li><a href="#参考">参考</a></li>
+</ul></li>
+</ul>
+</nav>
+  </div>
+</div>
+    <div class="post-content">
+      
+
+<p>如何在高并发的情况下，提高多核CPU的性能，一直是在并发编程领域中非常重要的问题。
+特别是随着云厂商按计算收费的当下，如何有效地利用计算资源变得更重要。</p>
+
+<blockquote>
+<p>致富的途径只有两种：一种是拼命赚钱，另外一种就是节约花钱。</p>
+</blockquote>
+
+<h2 id="什么是锁">什么是锁</h2>
+
+<p>在计算机硬件层是没有<code>锁</code>这个概念的，计算机领域中操作系统的<code>锁</code>来源于现实生活中的锁，它的作用是保护某种资源同一时间不能被多人访问。现代计算机都是多核CPU处理器，我们需要通过锁机制来协调多个内核对资源的访问操作。</p>
+
+<p>和现实中一样，在给资源上锁的时候，我们可能需要几个步骤：
+1. 拿出钥匙
+2. 锁上资源
+3. 解锁</p>
+
+<p>计算机中对应的CPU操作就是执行几条指令(CPU每条执行指令都是原子级别的操作，要么成功，要么失败，这是二进制世界的规则)。</p>
+
+<p>这里罗列几条与后面要讲到的锁相关的硬件同步汇编指令</p>
+
+<ul>
+<li>test_and_set</li>
+<li>swap</li>
+<li>get_and_add
+<br /></li>
+</ul>
+
+<p><strong>test_and_set</strong> 由3条CPU原语组成</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="err">​</span>    <span class="n">boolean</span> <span class="n">test_and_set</span><span class="p">(</span><span class="o">*</span><span class="n">lock</span><span class="p">){</span>
+<span class="err">​</span>       <span class="n">boolean</span> <span class="n">old</span><span class="o">=*</span><span class="n">lock</span><span class="p">;</span>
+<span class="err">​</span>       <span class="o">*</span><span class="n">lock</span><span class="o">=</span><span class="nb">true</span><span class="p">;</span>
+<span class="err">​</span>       <span class="k">return</span> <span class="n">old</span><span class="p">;</span>
+    <span class="p">}</span></code></pre></td></tr></table>
+</div>
+</div>
+<p>BTS 的指令含义是在执行 BT 命令的同时, 把操作数的指定位置为 1</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c">  <span class="k">do</span><span class="p">{</span>
+       <span class="c1">//当*lock为false是跳出该循环
+</span><span class="c1"></span>       <span class="k">while</span><span class="p">(</span><span class="n">test_and_set</span><span class="p">(</span><span class="o">*</span><span class="n">lock</span><span class="p">));</span>
+       <span class="n">critical</span> <span class="n">section</span><span class="p">;</span><span class="c1">//访问临界区
+</span><span class="c1"></span>      <span class="o">*</span><span class="n">lock</span><span class="o">=</span><span class="nb">false</span><span class="p">;</span>
+<span class="p">}</span><span class="k">while</span><span class="p">(</span><span class="nb">true</span><span class="p">)</span></code></pre></td></tr></table>
+</div>
+</div>
+<p><strong>swap</strong>也是由三条CPU原语组成:
+BSWAP的指令含义是：把32/64位寄存器的值按照低和高的字节交换(下面代码实现其实就是0=false,1=true交换)</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="kt">void</span> <span class="nf">swap</span><span class="p">(</span><span class="n">boolean</span> <span class="o">*</span><span class="n">a</span><span class="p">,</span><span class="n">boolean</span> <span class="o">*</span><span class="n">b</span><span class="p">){</span>
+    <span class="n">boolean</span> <span class="n">temp</span><span class="o">=*</span><span class="n">a</span><span class="p">;</span>
+    <span class="o">*</span><span class="n">a</span><span class="o">=*</span><span class="n">b</span><span class="p">;</span>
+    <span class="o">*</span><span class="n">b</span><span class="o">=</span><span class="n">temp</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="k">do</span><span class="p">{</span>
+    <span class="n">key</span><span class="o">=</span><span class="nb">true</span><span class="p">;</span>
+    <span class="k">do</span><span class="p">{</span>
+    <span class="n">swap</span><span class="p">(</span><span class="o">&amp;</span><span class="n">lock</span><span class="p">,</span><span class="o">&amp;</span><span class="n">key</span><span class="p">);</span>
+    <span class="p">}</span><span class="k">while</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+    <span class="c1">//上面初值为false
+</span><span class="c1"></span>    <span class="n">cirtical</span> <span class="n">section</span><span class="c1">//访问临界资源
+</span><span class="c1"></span>    <span class="n">lock</span><span class="o">=</span><span class="nb">false</span><span class="p">;</span>
+<span class="p">}</span><span class="k">while</span><span class="p">(</span><span class="nb">true</span><span class="p">)</span></code></pre></td></tr></table>
+</div>
+</div>
+<p>上面简要地说明了通过CPU硬件同步原语，对某个内存地址标志位的修改，起到加锁的作用。</p>
+
+<p>那么锁机制和性能有什么关系呢？这得从CPU缓存说起，因为你要加的锁在CPU缓存中。</p>
+
+<h2 id="多核cpu多级缓存架构">多核CPU多级缓存架构</h2>
+
+<p>早期的CPU架构基本上都采用SMP(Symmetric Multi-Processor)，这种对称多处理器结构，多个CPU内核共享内存资源，除了内存速度访问慢以外，
+还可能导致访问冲突。</p>
+
+<p>现代CPU为了提高数据的访问速度，采用了NUMA(Non-Uniform Memory Access)多级缓存的架构，如下图:</p>
+
+<p><img src="http://blog.xiebiao.com/images/2020-08-19-locks-on-multicore/CPU_Cache.png" alt="CPU多级缓存" /></p>
+
+<p>由于内存读取速度的较慢(科技发展遇到了阻碍?)，但是CPU读取速度提升较快，所以CPU厂商就在内存和CPU之间加了多级缓存来提高性能。</p>
+
+<p><img src="http://blog.xiebiao.com/images/2020-08-19-locks-on-multicore/CPU_Cache_Access.png" alt="访问速度与容量对比" title="图片来源于网络，请联系删除" /></p>
+
+<p>内核首先从L1缓存中读取数据，如果没有就到L2缓存中读取，如果没有就到
+L3缓存中去读取，最坏的情况就是L3缓存也没有，那就只能到内存中去读取。</p>
+
+<p>但这种方案也不是没有弊端，因为越是靠近内核的缓存越贵，不能肆意地设计得很大。</p>
+
+<p>更详细的内存架构介绍，建议阅读:<a href="https://www.techbang.com/posts/18381-from-the-channel-to-address-computer-main-memory-structures-to-understand?page=2">圖解RAM結構與原理，系統記憶體的Channel、Chip與Bank</a></p>
+
+<h2 id="自旋锁">自旋锁</h2>
+
+<p>上面介绍了CPU多级内存架构，有助于理解后面锁相关的性能问题。同时上面还提到了一种硬件同步锁实现<strong>test_and_set</strong>，从实现中你可能发现代码中使用了:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="k">while</span><span class="p">(</span><span class="n">test_and_set</span><span class="p">(</span><span class="o">*</span><span class="n">lock</span><span class="p">));</span></code></pre></td></tr></table>
+</div>
+</div>
+<p>这就是自旋锁，自旋锁的原理是，如果锁被别的执行单元保持，那么调用者就一直循环在那里查看锁保持者是否释放了锁，即忙则等待。</p>
+
+<p>这里有个细节就是等待的调用者并不是休眠，而是一直在工作占用CPU。</p>
+
+<p>结合上面提到的多核多级CPU缓存，如果当多个内核执行单元都在调用获取锁时，没有获取到锁的内核将一直繁忙，处于中断状态。</p>
+
+<p>所以这种自旋锁的缺点就是:
+1. 容易导致死锁
+2. 过度消耗CPU资源
+3. 竞争不具备公平性</p>
+
+<p>对于第3点，很容易想到，如果执行单元释放了锁，后面哪个执行单元会获取到锁呢？这里没有机制保证每个执行单元都能获取到锁。</p>
+
+<h3 id="clh锁">CLH锁</h3>
+
+<p>基于上面说的缺点，计算机界的大拿总有解决办法的，于是就有了1991年提出的这篇论文<a href="https://dl.acm.org/doi/10.1145/103727.103729"><em>Algorithms for scalable synchronization on shared-memory multiprocessors</em></a>，这篇论文中提出了CLH锁(Craig, Landin, and Hagersten  locks): 也是一个自旋锁。</p>
+
+<p>CLH锁解决了饥饿问题，通过FIFO来保证公平性。</p>
+
+<p>CLH锁也是一种基于链表的可扩展、高性能、公平的自旋锁，申请线程只在本地变量上自旋，它不断轮询前驱的状态，如果发现前驱释放了锁就结束自旋。</p>
+
+<p>CLH锁的实现如下:</p>
+
+<ol>
+<li>两个ThreadLocal变量，一个表示当前节点，一个表示前趋节点</li>
+<li>通过CAS原语加入队尾</li>
+<li>每个线程尝试用自己去替换tail，并循环获取前趋节点上的锁，直到锁被释放。</li>
+<li>线程释放锁之后，将当前节点设置为前继节点</li>
+</ol>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-Java" data-lang="Java"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-Java" data-lang="Java"><span class="kd">public</span> <span class="kd">class</span> <span class="nc">CLHLock</span> <span class="o">{</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="n">ThreadLocal</span><span class="o">&lt;</span><span class="n">QNode</span><span class="o">&gt;</span> <span class="n">prev</span><span class="o">;</span> 
+    <span class="kd">private</span> <span class="kd">final</span> <span class="n">ThreadLocal</span><span class="o">&lt;</span><span class="n">QNode</span><span class="o">&gt;</span> <span class="n">current</span><span class="o">;</span> 
+    <span class="kd">private</span> <span class="kd">final</span> <span class="n">AtomicReference</span><span class="o">&lt;</span><span class="n">QNode</span><span class="o">&gt;</span> <span class="n">tail</span> <span class="o">=</span> <span class="k">new</span> <span class="n">AtomicReference</span><span class="o">&lt;</span><span class="n">QNode</span><span class="o">&gt;(</span><span class="k">new</span> <span class="n">QNode</span><span class="o">());</span>
+
+    <span class="kd">public</span> <span class="nf">CLHLock</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">prev</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ThreadLocal</span><span class="o">&lt;</span><span class="n">QNode</span><span class="o">&gt;()</span> <span class="o">{</span>
+            <span class="nd">@Override</span>
+            <span class="kd">protected</span> <span class="n">QNode</span> <span class="nf">initialValue</span><span class="o">()</span> <span class="o">{</span>
+                <span class="k">return</span> <span class="kc">null</span><span class="o">;</span>
+            <span class="o">}</span>
+        <span class="o">};</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">current</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ThreadLocal</span><span class="o">&lt;</span><span class="n">QNode</span><span class="o">&gt;()</span> <span class="o">{</span>
+            <span class="nd">@Override</span>
+            <span class="kd">protected</span> <span class="n">QNode</span> <span class="nf">initialValue</span><span class="o">()</span> <span class="o">{</span>
+                <span class="k">return</span> <span class="k">new</span> <span class="n">QNode</span><span class="o">();</span><span class="c1">//线程本地本地缓存
+</span><span class="c1"></span>            <span class="o">}</span>
+        <span class="o">};</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">lock</span><span class="o">()</span> <span class="o">{</span>
+        <span class="n">QNode</span> <span class="n">current</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="na">current</span><span class="o">.</span><span class="na">get</span><span class="o">();</span> 
+        <span class="n">current</span><span class="o">.</span><span class="na">lock</span> <span class="o">=</span> <span class="kc">true</span><span class="o">;</span>
+        <span class="n">QNode</span> <span class="n">pred</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="na">tail</span><span class="o">.</span><span class="na">getAndSet</span><span class="o">(</span><span class="n">current</span><span class="o">);</span> 
+        <span class="k">this</span><span class="o">.</span><span class="na">prev</span><span class="o">.</span><span class="na">set</span><span class="o">(</span><span class="n">pred</span><span class="o">);</span> 
+        <span class="k">while</span> <span class="o">(</span><span class="n">pred</span><span class="o">.</span><span class="na">lock</span><span class="o">)</span> <span class="o">;</span><span class="c1">//自旋
+</span><span class="c1"></span>    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">unlock</span><span class="o">()</span> <span class="o">{</span>
+        <span class="n">QNode</span> <span class="n">current</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="na">current</span><span class="o">.</span><span class="na">get</span><span class="o">();</span>
+        <span class="n">current</span><span class="o">.</span><span class="na">lock</span> <span class="o">=</span> <span class="kc">false</span><span class="o">;</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">current</span><span class="o">.</span><span class="na">set</span><span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="na">prev</span><span class="o">.</span><span class="na">get</span><span class="o">());</span>
+        <span class="n">current</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span><span class="c1">//GC
+</span><span class="c1"></span>    <span class="o">}</span>
+
+    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">class</span> <span class="nc">QNode</span> <span class="o">{</span>
+        <span class="kd">private</span> <span class="kd">volatile</span> <span class="kt">boolean</span> <span class="n">lock</span> <span class="o">=</span> <span class="kc">false</span><span class="o">;</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre></td></tr></table>
+</div>
+</div>
+<p>CLH自旋锁的优点是空间复杂度低，L个线程n个锁的复杂度为O（L+n）</p>
+
+<p>JAVA并发框架中(<code>java.util.concurrent.locks.AbstractQueuedSynchronizer.Node</code>)也是基于CLH锁。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-JAVA" data-lang="JAVA"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-JAVA" data-lang="JAVA">    <span class="o">/**</span>
+     <span class="o">*</span> <span class="n">Wait</span> <span class="n">queue</span> <span class="n">node</span> <span class="n">class</span><span class="o">.</span>
+     <span class="o">*</span>
+     <span class="o">*</span> <span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="n">The</span> <span class="n">wait</span> <span class="n">queue</span> <span class="n">is</span> <span class="n">a</span> <span class="n">variant</span> <span class="n">of</span> <span class="n">a</span> <span class="s">&#34;CLH&#34;</span> <span class="o">(</span><span class="n">Craig</span><span class="o">,</span> <span class="n">Landin</span><span class="o">,</span> <span class="n">and</span>
+     <span class="o">*</span> <span class="n">Hagersten</span><span class="o">)</span> <span class="n">lock</span> <span class="n">queue</span><span class="o">.</span> <span class="n">CLH</span> <span class="n">locks</span> <span class="n">are</span> <span class="n">normally</span> <span class="n">used</span> <span class="k">for</span>
+     <span class="o">*</span> <span class="n">spinlocks</span><span class="o">.</span>  <span class="n">We</span> <span class="n">instead</span> <span class="n">use</span> <span class="n">them</span> <span class="k">for</span> <span class="n">blocking</span> <span class="n">synchronizers</span><span class="o">,</span> <span class="n">but</span>
+     <span class="o">*</span> <span class="n">use</span> <span class="n">the</span> <span class="n">same</span> <span class="n">basic</span> <span class="n">tactic</span> <span class="n">of</span> <span class="n">holding</span> <span class="n">some</span> <span class="n">of</span> <span class="n">the</span> <span class="n">control</span>
+     <span class="o">*</span> <span class="n">information</span> <span class="n">about</span> <span class="n">a</span> <span class="n">thread</span> <span class="n">in</span> <span class="n">the</span> <span class="n">predecessor</span> <span class="n">of</span> <span class="n">its</span> <span class="n">node</span><span class="o">.</span>  <span class="n">A</span>
+     <span class="o">*</span> <span class="s">&#34;status&#34;</span> <span class="n">field</span> <span class="n">in</span> <span class="n">each</span> <span class="n">node</span> <span class="n">keeps</span> <span class="n">track</span> <span class="n">of</span> <span class="n">whether</span> <span class="n">a</span> <span class="n">thread</span>
+     <span class="o">*</span> <span class="n">should</span> <span class="n">block</span><span class="o">.</span>  <span class="n">A</span> <span class="n">node</span> <span class="n">is</span> <span class="n">signalled</span> <span class="n">when</span> <span class="n">its</span> <span class="n">predecessor</span>
+     <span class="o">*</span> <span class="n">releases</span><span class="o">.</span>  <span class="n">Each</span> <span class="n">node</span> <span class="n">of</span> <span class="n">the</span> <span class="n">queue</span> <span class="n">otherwise</span> <span class="n">serves</span> <span class="n">as</span> <span class="n">a</span>
+     <span class="o">*</span> <span class="n">specific</span><span class="o">-</span><span class="n">notification</span><span class="o">-</span><span class="n">style</span> <span class="n">monitor</span> <span class="n">holding</span> <span class="n">a</span> <span class="n">single</span> <span class="n">waiting</span>
+     <span class="o">*</span> <span class="n">thread</span><span class="o">.</span> <span class="n">The</span> <span class="n">status</span> <span class="n">field</span> <span class="n">does</span> <span class="n">NOT</span> <span class="n">control</span> <span class="n">whether</span> <span class="n">threads</span> <span class="n">are</span>
+     <span class="o">*</span> <span class="n">granted</span> <span class="n">locks</span> <span class="n">etc</span> <span class="n">though</span><span class="o">.</span>  <span class="n">A</span> <span class="n">thread</span> <span class="n">may</span> <span class="k">try</span> <span class="n">to</span> <span class="n">acquire</span> <span class="k">if</span> <span class="n">it</span> <span class="n">is</span>
+     <span class="o">*</span> <span class="n">first</span> <span class="n">in</span> <span class="n">the</span> <span class="n">queue</span><span class="o">.</span> <span class="n">But</span> <span class="n">being</span> <span class="n">first</span> <span class="n">does</span> <span class="n">not</span> <span class="n">guarantee</span> <span class="n">success</span><span class="o">;</span>
+     <span class="o">*</span> <span class="n">it</span> <span class="n">only</span> <span class="n">gives</span> <span class="n">the</span> <span class="n">right</span> <span class="n">to</span> <span class="n">contend</span><span class="o">.</span>  <span class="n">So</span> <span class="n">the</span> <span class="n">currently</span> <span class="n">released</span>
+     <span class="o">*</span> <span class="n">contender</span> <span class="n">thread</span> <span class="n">may</span> <span class="n">need</span> <span class="n">to</span> <span class="n">rewait</span><span class="o">.</span></code></pre></td></tr></table>
+</div>
+</div>
+<p>如果你对上面讲的多核CPU多级缓存架构还有印象，那么你还是会发现CLH锁也有一个明显的缺点，
+那就是:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-Java" data-lang="Java"><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-Java" data-lang="Java">  <span class="k">while</span> <span class="o">(</span><span class="n">pred</span><span class="o">.</span><span class="na">lock</span><span class="o">)</span> <span class="o">;//</span><span class="n">自旋</span></code></pre></td></tr></table>
+</div>
+</div>
+<p>这里的自旋可能发生在非本地缓存上，那么当内核需要循环读取一个非本地(或者说离自己很远)缓存中的数据时，在多级缓存架构中那就是个灾难。</p>
+
+<p>于是就有了&hellip;&hellip;</p>
+
+<h3 id="mcs锁">MCS锁</h3>
+
+<p>MCS锁对CLH锁进行了优化，自旋发生在本地节点上。</p>
+
+<p>实现如下:
+1. 队列初始化时没有结点，tail=null
+2. 线程A想要获取锁，于是将自己置于队尾，由于它是第一个结点，它的locked域为false
+3. 线程B和C相继加入队列，a-&gt;next=b,b-&gt;next=c。且B和C现在没有获取锁，处于等待状态，所以它们的locked域为true，
+尾指针指向线程C对应的结点
+4. 线程A释放锁后，顺着它的next指针找到了线程B，并把B的locked域设置为false。这一动作会触发线程B获取锁</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-Java" data-lang="Java"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-Java" data-lang="Java"><span class="kd">public</span> <span class="kd">class</span> <span class="nc">MCSLock</span>  <span class="o">{</span>
+    <span class="kd">private</span> <span class="n">AtomicReference</span><span class="o">&lt;</span><span class="n">QNode</span><span class="o">&gt;</span> <span class="n">tail</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="n">ThreadLocal</span><span class="o">&lt;</span><span class="n">QNode</span><span class="o">&gt;</span> <span class="n">current</span><span class="o">;</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">lock</span><span class="o">()</span> <span class="o">{</span>
+        <span class="n">tail</span> <span class="o">=</span> <span class="k">new</span> <span class="n">AtomicReference</span><span class="o">&lt;</span><span class="n">QNode</span><span class="o">&gt;(</span><span class="k">new</span> <span class="n">QNode</span><span class="o">());</span>  
+        <span class="n">QNode</span> <span class="n">current</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="na">current</span><span class="o">.</span><span class="na">get</span><span class="o">();</span>
+        <span class="n">QNode</span> <span class="n">pred</span> <span class="o">=</span> <span class="n">tail</span><span class="o">.</span><span class="na">getAndSet</span><span class="o">(</span><span class="n">current</span><span class="o">);</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">pred</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">current</span><span class="o">.</span><span class="na">locked</span> <span class="o">=</span> <span class="kc">true</span><span class="o">;</span>
+            <span class="n">pred</span><span class="o">.</span><span class="na">next</span> <span class="o">=</span> <span class="n">current</span><span class="o">;</span>
+            <span class="k">while</span> <span class="o">(</span><span class="n">current</span><span class="o">.</span><span class="na">locked</span><span class="o">)</span> <span class="o">;</span><span class="c1">//自旋
+</span><span class="c1"></span>        <span class="o">}</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">unlock</span><span class="o">()</span> <span class="o">{</span>
+        <span class="n">QNode</span> <span class="n">current</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="na">current</span><span class="o">.</span><span class="na">get</span><span class="o">();</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">current</span><span class="o">.</span><span class="na">next</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">tail</span><span class="o">.</span><span class="na">compareAndSet</span><span class="o">(</span><span class="n">current</span><span class="o">,</span> <span class="kc">null</span><span class="o">)){</span>
+                <span class="k">return</span><span class="o">;</span>
+            <span class="o">}</span>
+            <span class="k">while</span> <span class="o">(</span><span class="n">current</span><span class="o">.</span><span class="na">next</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">;</span><span class="c1">//自旋
+</span><span class="c1"></span>        <span class="o">}</span>
+        <span class="n">current</span><span class="o">.</span><span class="na">next</span><span class="o">.</span><span class="na">locked</span> <span class="o">=</span> <span class="kc">false</span><span class="o">;</span>
+        <span class="n">current</span><span class="o">.</span><span class="na">next</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">class</span> <span class="nc">QNode</span> <span class="o">{</span>
+       <span class="kd">volatile</span> <span class="kt">boolean</span> <span class="n">locked</span> <span class="o">=</span> <span class="kc">false</span><span class="o">;</span>
+        <span class="n">QNode</span> <span class="n">next</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre></td></tr></table>
+</div>
+</div>
+<h2 id="参考">参考</h2>
+
+<p><a href="http://https://www.cs.rice.edu/~johnmc/comp522/lecture-notes/COMP522-2019-LocksOnMulticore.pdf"><em>Locks on Multicore and Multisocket Platforms</em></a></p>
+
+<p><a href="https://www.cnblogs.com/yuyutianxia/p/4296220.html">https://www.cnblogs.com/yuyutianxia/p/4296220.html</a></p>
+
+    </div>
+
+    <div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">Author</span>
+    <span class="item-content">Bill Xie</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">LastMod</span>
+    <span class="item-content">
+        2020-08-19
+        
+    </span>
+  </p>
+  
+  
+</div>
+<footer class="post-footer">
+      <div class="post-tags">
+          <a href="/tags/concurrency/">Concurrency</a>
+          </div>
+      <nav class="post-nav">
+        
+        <a class="next" href="/post/2020-01-21-untestable-code/">
+            <span class="next-text nav-default">不可测试的代码</span>
+            <span class="next-text nav-mobile">Next</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        
+
+  
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="https://stackoverflow.com/users/1130203/bill-xie" class="iconfont icon-stack-overflow" title="stack-overflow"></a>
+      <a href="https://twitter.com/joyrap" class="iconfont icon-twitter" title="twitter"></a>
+      <a href="https://github.com/xiebiao" class="iconfont icon-github" title="github"></a>
+  <a href="http://blog.xiebiao.com/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" href="https://gohugo.io">Hugo</a>
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    Theme - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    2012 - 
+    2020
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">来自山川湖海，却囿于昼夜，厨房与爱。------万能青年旅店</span>
+  </span>
+</div>
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
+<script type="text/javascript" src="/dist/even.26188efa.min.js"></script>
+
+
+
+
+
+
+
+
+</body>
+</html>

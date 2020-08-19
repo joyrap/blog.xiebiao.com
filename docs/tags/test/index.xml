@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Test on 独立，但不独行</title>
+    <link>http://blog.xiebiao.com/tags/test/</link>
+    <description>Recent content in Test on 独立，但不独行</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <copyright>来自山川湖海，却囿于昼夜，厨房与爱。------万能青年旅店</copyright>
+    <lastBuildDate>Tue, 21 Jan 2020 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="http://blog.xiebiao.com/tags/test/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>不可测试的代码</title>
+      <link>http://blog.xiebiao.com/post/2020-01-21-untestable-code/</link>
+      <pubDate>Tue, 21 Jan 2020 00:00:00 +0000</pubDate>
+      
+      <guid>http://blog.xiebiao.com/post/2020-01-21-untestable-code/</guid>
+      <description>故事是这样的，我最近深陷在一个刚接手不久的项目中，经过完成两轮需求上线后， 我迫切地告诉自己，需要给这个项目完善一下测试用例（原工程测试用例几</description>
+    </item>
+    
+  </channel>
+</rss>
