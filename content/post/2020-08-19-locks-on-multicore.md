@@ -72,7 +72,7 @@ do{
 早期的CPU架构基本上都采用SMP(Symmetric Multi-Processor)，这种对称多处理器结构，多个CPU内核共享内存资源，除了内存速度访问慢以外，
 还可能导致访问冲突。
 
-现代CPU为了提高数据的访问速度，采用了NUMA(Non-Uniform Memory Access)多级缓存的架构，每个内核都有自己的缓存，如下图:
+现代CPU为了提高数据的访问速度，采用了NUMA(Non-Uniform Memory Access)多级缓存的架构，每个内核都有自己的[**缓存**](https://zh.wikipedia.org/wiki/CPU%E7%BC%93%E5%AD%98)，如下图:
 
 ![CPU多级缓存](http://blog.xiebiao.com/images/2020-08-19-locks-on-multicore/CPU_Cache.png "")
 
@@ -89,9 +89,9 @@ L3缓存中去读取，最坏的情况就是L3缓存也没有，那就只能到�
 
 当多个内核在对同一块数据做加锁操作时:
 
-- CPU1 从内存中读取一个字节，以及它和它相邻的字节被读入 CPU1 的高速缓存(因为CPU的高速缓存是按行存取的)
+- CPU1 从内存中读取一个字节，以及它和它相邻的字节被读入 CPU1 的高速缓存(因为CPU的高速缓存最小单位是行Cache Line)
 - CPU2 和CPU1同样的操作
-- 这是CPU1 完成数据修改，通过内存总线控制，写回内存
+- CPU1 完成数据修改，通过内存总线控制，写回内存
 - CPU2 高速缓存数据失效，重新读取
   
 这个过程中，如果CPU1修改完数据，还没有写回内存时，CPU1与CPU2的高速缓存数据是不一致的，这时CPU通过内存总线
@@ -275,6 +275,8 @@ public class MCSLock  {
 - [*Is Parallel Programming Hard, And, If So, What Can You Do About It?*](https://mirrors.edge.kernel.org/pub/linux/kernel/people/paulmck/perfbook/perfbook.html)
   
 - [*Caching*](https://cseweb.ucsd.edu/classes/sp13/cse141-a/Slides/10_Caches_detail.pdf)
+
+- [*CPU缓存*](https://zh.wikipedia.org/wiki/CPU%E7%BC%93%E5%AD%98)
 
 - [*https://www.cnblogs.com/bjlhx/p/10658938.html*](https://www.cnblogs.com/bjlhx/p/10658938.html)
 
