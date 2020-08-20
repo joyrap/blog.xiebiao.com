@@ -81,7 +81,7 @@ do{
 ![访问速度与容量对比](http://blog.xiebiao.com/images/2020-08-19-locks-on-multicore/CPU_Cache_Access.png "图片来源于网络，请联系删除")
 
 内核首先从L1缓存中读取数据，如果没有就到L2缓存中读取，如果没有就到
-L3缓存中去读取，最坏的情况就是L3缓存也没有，那就只能到内存中去读取。
+L3缓存中去读取，最坏的情况就是L3缓存也没有，那就只能到[**内存中去读取**](https://people.freebsd.org/~lstewart/articles/cpumemory.pdf)。
 
 但这种方案也不是没有限制，因为越是靠近内核的缓存越贵，不能肆意地设计得很大。
 
@@ -270,6 +270,7 @@ public class MCSLock  {
 
 ## 参考
 
+- [*What Every Programmer Should Know About Memory*](https://people.freebsd.org/~lstewart/articles/cpumemory.pdf)
 - [*Locks on Multicore and Multisocket Platforms*](http://https://www.cs.rice.edu/~johnmc/comp522/lecture-notes/COMP522-2019-LocksOnMulticore.pdf)
 
 - [*Is Parallel Programming Hard, And, If So, What Can You Do About It?*](https://mirrors.edge.kernel.org/pub/linux/kernel/people/paulmck/perfbook/perfbook.html)
