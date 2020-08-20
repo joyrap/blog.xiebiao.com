@@ -76,7 +76,9 @@ do{
 
 ![CPU多级缓存](http://blog.xiebiao.com/images/2020-08-19-locks-on-multicore/CPU_Cache.png "")
 
-由于内存读取速度的较慢(科技发展遇到了阻碍?)，但是CPU读取速度提升较快，所以CPU厂商才在内存和CPU之间加了多级缓存来缓解速度的不对等，充分利用CPU。
+由于内存读取速度的较慢(科技发展遇到了阻碍?)，但是CPU读取速度提升较快，所以CPU厂商才在内存和CPU之间加了多级缓存来缓解速度的不对等，充分利用CPU。来自Red Hat工程师这篇[**What Every Programmer Should Know About Memory**](https://people.freebsd.org/~lstewart/articles/cpumemory.pdf) 文章进行了详细的介绍。
+
+一个直观的理解，如下图：
 
 ![访问速度与容量对比](http://blog.xiebiao.com/images/2020-08-19-locks-on-multicore/CPU_Cache_Access.png "图片来源于网络，请联系删除")
 
