@@ -447,8 +447,9 @@ class RhsPadding extends Value {
 
 ### 扩展阅读
 
-* [perfbook](https://mirrors.edge.kernel.org/pub/linux/kernel/people/paulmck/perfbook/perfbook.html)
+ - [*Is Parallel Programming Hard, And, If So, What Can You Do About It?*](https://mirrors.edge.kernel.org/pub/linux/kernel/people/paulmck/perfbook/perfbook.html)
 
+- [*计算机多核平台上的锁(一)*](http://blog.xiebiao.com/post/2020-08-19-locks-on-multicore/)
 
 ### 翻译后记
 

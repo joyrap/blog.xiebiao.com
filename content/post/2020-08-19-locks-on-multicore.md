@@ -14,9 +14,10 @@ tags: ["Concurrency"]
 在计算机硬件层其实是没有`锁`这个概念的，计算机领域中的`锁`来源于现实生活中的锁，它的作用是保护某种资源同一时间不能被多人访问。现代计算机已经发展成了多核CPU处理器，我们需要通过锁机制来协调多个内核对资源的访问操作。
 
 和现实中一样，在给资源上锁的时候，我们可能需要几个步骤：
-1. 拿出钥匙
-2. 锁上资源
-3. 解锁
+
+  1. 拿出钥匙
+  2. 锁上资源
+  3. 解锁
 
 计算机中对应的CPU操作就是执行几条指令(CPU每条执行指令都是原子级别的操作，要么成功，要么失败，这是二进制世界的规则)。
 
@@ -35,7 +36,7 @@ tags: ["Concurrency"]
     }
 
 ```
-BTS 的指令含义是在执行 BT 命令的同时, 把操作数的指定位置为 1
+BTS 指令含义是在执行 BT 命令的同时, 把操作数的指定位置为 1
 ``` c
   do{
        //当*lock为false是跳出该循环
@@ -45,7 +46,7 @@ BTS 的指令含义是在执行 BT 命令的同时, 把操作数的指定位置�
 }while(true)
 ```
 **swap**也是由三条CPU原语组成:
-BSWAP的指令含义是：把32/64位寄存器的值按照低和高的字节交换(下面代码实现其实就是0=false,1=true交换)
+BSWAP指令含义是：把32/64位寄存器的值按照低和高的字节交换(下面代码实现其实就是0=false,1=true交换)
 ``` c
 void swap(boolean *a,boolean *b){
     boolean temp=*a;
@@ -84,6 +85,20 @@ L3缓存中去读取，最坏的情况就是L3缓存也没有，那就只能到�
 
 但这种方案也不是没有限制，因为越是靠近内核的缓存越贵，不能肆意地设计得很大。
 
+### CPU缓存读写
+
+当多个内核在对同一块数据做加锁操作时:
+
+- CPU1 从内存中读取一个字节，以及它和它相邻的字节被读入 CPU1 的高速缓存(因为CPU的高速缓存是按行存取的)
+- CPU2 和CPU1同样的操作
+- 这是CPU1 完成数据修改，通过内存总线控制，写回内存
+- CPU2 高速缓存数据失效，重新读取
+  
+这个过程中，如果CPU1修改完数据，还没有写回内存时，CPU1与CPU2的高速缓存数据是不一致的，这时CPU通过内存总线
+缓存协议MESI来保证一致性。
+
+可以看出，数据加锁这个操作非常复杂。特别是在多个内核之间共享数据。
+
 更详细的内存架构介绍，建议阅读:[圖解RAM結構與原理，系統記憶體的Channel、Chip與Bank](https://www.techbang.com/posts/18381-from-the-channel-to-address-computer-main-memory-structures-to-understand?page=2)
 
 ## 自旋锁
@@ -92,7 +107,7 @@ L3缓存中去读取，最坏的情况就是L3缓存也没有，那就只能到�
 ``` c
 while(test_and_set(*lock));
 ```
-这就是自旋锁，自旋锁的原理是，如果锁被别的执行单元保持，那么调用者就一直循环在那里查看锁保持者是否释放了锁，即忙则等待。
+这就是自旋锁机制，自旋锁的原理是，如果锁被别的执行单元保持，那么调用者就一直循环在那里查看锁保持者是否释放了锁，即忙则等待。
 
 这里有个细节就是等待锁的调用者并不是休眠，而是一直在工作占用CPU。
 
@@ -165,7 +180,7 @@ public class CLHLock {
 
 CLH自旋锁的优点是空间复杂度低，L个线程n个锁的复杂度为O（L+n）
 
-JAVA中的AQS并发框架(`java.util.concurrent.locks.AbstractQueuedSynchronizer.Node`)也是基于CLH锁，但是它是一个变种，它考虑了等待队列中取消获取锁的情况。
+JAVA中的AQS并发框架(`java.util.concurrent.locks.AbstractQueuedSynchronizer.Node`)也是基于CLH锁，但是它是一个变种，它考虑了等待队列中取消获取锁的情况，以及释放锁的线程可以向获取同一把锁的线程发送消息。
 
 JDK中的描述:
 
@@ -247,10 +262,20 @@ public class MCSLock  {
     }
 }
 ```
+## 总结
 
+自旋锁通过忙则等待的机制占用CPU资源，但这样的好处也是有的，防止线程上下文切换(参考CPU缓存读写一节)，这和互斥锁是有很大区别。
+
+同时由于占用CPU资源的问题，在实际使用过程中，尽量让被保护的临界区小，保证可以快速地释放锁。
 
 ## 参考
 
-[*Locks on Multicore and Multisocket Platforms*](http://https://www.cs.rice.edu/~johnmc/comp522/lecture-notes/COMP522-2019-LocksOnMulticore.pdf)
+- [*Locks on Multicore and Multisocket Platforms*](http://https://www.cs.rice.edu/~johnmc/comp522/lecture-notes/COMP522-2019-LocksOnMulticore.pdf)
 
-[*https://www.cnblogs.com/yuyutianxia/p/4296220.html*](https://www.cnblogs.com/yuyutianxia/p/4296220.html)
+- [*Is Parallel Programming Hard, And, If So, What Can You Do About It?*](https://mirrors.edge.kernel.org/pub/linux/kernel/people/paulmck/perfbook/perfbook.html)
+  
+- [*Caching*](https://cseweb.ucsd.edu/classes/sp13/cse141-a/Slides/10_Caches_detail.pdf)
+
+- [*https://www.cnblogs.com/bjlhx/p/10658938.html*](https://www.cnblogs.com/bjlhx/p/10658938.html)
+
+- [*https://www.cnblogs.com/yuyutianxia/p/4296220.html*](https://www.cnblogs.com/yuyutianxia/p/4296220.html)
