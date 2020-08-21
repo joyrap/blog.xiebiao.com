@@ -121,7 +121,9 @@ while(test_and_set(*lock));
 2. 过度消耗CPU资源
 3. 竞争不具备公平性
 
-第2点，业界经过测试发现test_and_set锁随着线程和内核的增长，性能成指数级下(exponential backoff)，毫无可扩展性可言。
+第2点，业界经过测试发现test_and_set锁随着线程和内核的增长，会导致exponential backoff，毫无可扩展性可言。
+
+>"Exponential backoff is an algorithm that uses feedback to multiplicatively decrease the rate of some process, in order to gradually find an acceptable rate"
 
 对于第3点，很容易想到，如果执行单元释放了锁，后面哪个执行单元会获取到锁呢？这里没有机制保证每个执行单元都能获取到锁。
 
@@ -220,7 +222,7 @@ JDK中的描述:
 
 ### MCS锁
 
-1993年这篇[**_Algorithms for scalable synchronization on shared-memory multiprocessors_**]论文提出了MCS(John Mellor-Crummey and Michael Scott)锁，针对CLH锁进行了优化，其主要区别是自旋发生在本地节点上。
+1991年这篇[**_Algorithms for scalable synchronization on shared-memory multiprocessors_**](https://www.cs.rice.edu/~johnmc/papers/tocs91.pdf)论文提出了MCS(John Mellor-Crummey and Michael Scott)锁，针对CLH锁进行了优化，其主要区别是自旋发生在本地节点上。
 
 实现如下:
 
@@ -273,7 +275,7 @@ public class MCSLock  {
 
 ## 参考
 
-- [*Algorithms for scalable synchronization on shared-memory multiprocessors*](https://www.cs.rochester.edu/u/scott/papers/1991_TOCS_synch.pdf)
+- [*Algorithms for scalable synchronization on shared-memory multiprocessors*](https://www.cs.rice.edu/~johnmc/papers/tocs91.pdf)
 
 - [*What Every Programmer Should Know About Memory*](https://people.freebsd.org/~lstewart/articles/cpumemory.pdf)
 - [*Locks on Multicore and Multisocket Platforms*](http://https://www.cs.rice.edu/~johnmc/comp522/lecture-notes/COMP522-2019-LocksOnMulticore.pdf)
