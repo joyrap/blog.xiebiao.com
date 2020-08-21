@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  计算机多内核平台上的锁(一)
+title:  计算机多内核平台上的锁优化(一)
 date:   2020-08-19
 categories: ["Programming"]
 tags: ["Concurrency"]
@@ -69,10 +69,10 @@ do{
 
 ## 多核CPU多级缓存架构
 
-早期的CPU架构基本上都采用SMP(Symmetric Multi-Processor)，这种对称多处理器结构，多个CPU内核共享内存资源，除了内存速度访问慢以外，
+早期的CPU架构基本上都采用[SMP(Symmetric Multi-Processor)](https://zh.wikipedia.org/wiki/%E5%AF%B9%E7%A7%B0%E5%A4%9A%E5%A4%84%E7%90%86)，这种对称多处理器结构，多个CPU内核共享内存资源，除了内存速度访问慢以外，
 还可能导致访问冲突。
 
-现代CPU为了提高数据的访问速度，采用了NUMA(Non-Uniform Memory Access)多级缓存的架构，每个内核都有自己的[**缓存**](https://zh.wikipedia.org/wiki/CPU%E7%BC%93%E5%AD%98)，如下图:
+现代CPU为了提高数据的访问速度，采用了[NUMA(Non-Uniform Memory Access)](https://zh.wikipedia.org/wiki/%E9%9D%9E%E5%9D%87%E5%8C%80%E8%AE%BF%E5%AD%98%E6%A8%A1%E5%9E%8B)多级缓存的架构，每个内核都有自己的[缓存](https://zh.wikipedia.org/wiki/CPU%E7%BC%93%E5%AD%98)，如下图:
 
 ![CPU多级缓存](http://blog.xiebiao.com/images/2020-08-19-locks-on-multicore/CPU_Cache.png "")
 
@@ -120,12 +120,14 @@ while(test_and_set(*lock));
 1. 容易导致死锁
 2. 过度消耗CPU资源
 3. 竞争不具备公平性
-   
+
+第2点，业界经过测试发现test_and_set锁随着线程和内核的增长，性能成指数级下(exponential backoff)，毫无可扩展性可言。
+
 对于第3点，很容易想到，如果执行单元释放了锁，后面哪个执行单元会获取到锁呢？这里没有机制保证每个执行单元都能获取到锁。
 
 ### CLH锁
 
-基于上面说的缺点，计算机界的大拿总有解决办法的，于是就有了1991年提出的这篇论文[**_Algorithms for scalable synchronization on shared-memory multiprocessors_**](https://dl.acm.org/doi/10.1145/103727.103729)，这篇论文中提出了CLH锁(Craig, Landin, and Hagersten  locks): 也是一个自旋锁。
+基于上面说的缺点，1993年由Travis Craig，Anders Landin 和 Eric Hagersten，提出了CLH锁，它也是一个自旋锁。
 
 CLH锁解决了饥饿问题，通过FIFO来保证公平性。
 
@@ -154,7 +156,7 @@ public class CLHLock {
         this.current = new ThreadLocal<QNode>() {
             @Override
             protected QNode initialValue() {
-                return new QNode();//线程本地本地缓存
+                return new QNode();//线程本地缓存
             }
         };
     }
@@ -180,7 +182,7 @@ public class CLHLock {
 }
 ```
 
-CLH自旋锁的优点是空间复杂度低，L个线程n个锁的复杂度为O（L+n）
+CLH自旋锁的优点是空间复杂度低，L个线程n个锁的复杂度为O（L+n）。
 
 JAVA中的AQS并发框架(`java.util.concurrent.locks.AbstractQueuedSynchronizer.Node`)也是基于CLH锁，但是它是一个变种，它考虑了等待队列中取消获取锁的情况，以及释放锁的线程可以向获取同一把锁的线程发送消息。
 
@@ -212,13 +214,13 @@ JDK中的描述:
 ``` Java
   while (pred.lock) ;//自旋
 ```
-这里的自旋可能发生在非本地缓存上，那么当内核需要循环读取一个非本地(或者说离自己很远)缓存中的数据时，在多级缓存架构中那就是个灾难。
+这里的自旋可能发生在非本地缓存上，那么当内核需要循环读取一个非本地(或者说离自己很远)缓存中的数据时，在多级缓存架构中那就是个灾难，因为每一次读写都要通过控制器和总线(这和上面提到的SMP和NUMA处理器架构息息相关)，带来极大的开销。
 
 于是就有了......
 
 ### MCS锁
 
-MCS锁对CLH锁进行了优化，自旋发生在本地节点上。
+1993年这篇[**_Algorithms for scalable synchronization on shared-memory multiprocessors_**]论文提出了MCS(John Mellor-Crummey and Michael Scott)锁，针对CLH锁进行了优化，其主要区别是自旋发生在本地节点上。
 
 实现如下:
 
@@ -233,7 +235,6 @@ public class MCSLock  {
     private AtomicReference<QNode> tail;
     private ThreadLocal<QNode> current;
 
-    @Override
     public void lock() {
         tail = new AtomicReference<QNode>(new QNode());  
         QNode current = this.current.get();
@@ -245,7 +246,6 @@ public class MCSLock  {
         }
     }
 
-    @Override
     public void unlock() {
         QNode current = this.current.get();
         if (current.next == null) {
@@ -254,7 +254,7 @@ public class MCSLock  {
             }
             while (current.next == null) ;//自旋
         }
-        current.next.locked = false;
+        current.next.locked = false;//通知下一个节点
         current.next = null;
     }
 
@@ -264,6 +264,7 @@ public class MCSLock  {
     }
 }
 ```
+
 ## 总结
 
 自旋锁通过忙则等待的机制占用CPU资源，但这样的好处也是有的，防止线程上下文切换(参考CPU缓存读写一节)，这和互斥锁是有很大区别。
@@ -272,6 +273,8 @@ public class MCSLock  {
 
 ## 参考
 
+- [*Algorithms for scalable synchronization on shared-memory multiprocessors*](https://www.cs.rochester.edu/u/scott/papers/1991_TOCS_synch.pdf)
+
 - [*What Every Programmer Should Know About Memory*](https://people.freebsd.org/~lstewart/articles/cpumemory.pdf)
 - [*Locks on Multicore and Multisocket Platforms*](http://https://www.cs.rice.edu/~johnmc/comp522/lecture-notes/COMP522-2019-LocksOnMulticore.pdf)
 
@@ -279,8 +282,3 @@ public class MCSLock  {
   
 - [*Caching*](https://cseweb.ucsd.edu/classes/sp13/cse141-a/Slides/10_Caches_detail.pdf)
 
-- [*CPU缓存*](https://zh.wikipedia.org/wiki/CPU%E7%BC%93%E5%AD%98)
-
-- [*https://www.cnblogs.com/bjlhx/p/10658938.html*](https://www.cnblogs.com/bjlhx/p/10658938.html)
-
-- [*https://www.cnblogs.com/yuyutianxia/p/4296220.html*](https://www.cnblogs.com/yuyutianxia/p/4296220.html)
