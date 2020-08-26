@@ -6,6 +6,8 @@ categories: ["Programming"]
 tags: ["Concurrency"]
 ---
 
+> **申明: 大部分内容来源于网络，我不生产知识，我只是字符串搬运工。**
+
 在[**_Algorithms for scalable synchronization on shared-memory multiprocessors_**](https://www.cs.rice.edu/~johnmc/papers/tocs91.pdf)这篇论文中，CLH锁之前还提到了另外一个锁算法。
 
 ## 凭证锁(The Ticket Lock)
@@ -72,9 +74,10 @@ tags: ["Concurrency"]
 
 规则就这么简单。
 
-......
+未完待续......
 
 ## 相关阅读
 
 - [*计算机多内核平台上的锁优化(一)*](https://blog.xiebiao.com/post/2020-08-19-locks-on-multicore/)
--  [*The ccNUMA Memory Profiler*](http://www.cs.utah.edu/~ald/pubs/CC-numa.pdf)
+- [*The ccNUMA Memory Profiler*](http://www.cs.utah.edu/~ald/pubs/CC-numa.pdf)
+- [*Overview of Recent Supercomputers*](http://www.netlib.org/utk/papers/advanced-computers/overview.html)
