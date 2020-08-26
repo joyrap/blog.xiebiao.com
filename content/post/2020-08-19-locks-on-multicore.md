@@ -84,13 +84,15 @@ do{
 
 ![SMP](http://blog.xiebiao.com/images/2020-08-19-locks-on-multicore/CPU_Cache_0.png "")
 
-CPU通过北桥访问内存。
+所有CPU通过北桥访问内存，访问带宽也是一个问题。
 
 现代CPU为了提高数据的访问速度，采用了[NUMA(Non-Uniform Memory Access)](https://zh.wikipedia.org/wiki/%E9%9D%9E%E5%9D%87%E5%8C%80%E8%AE%BF%E5%AD%98%E6%A8%A1%E5%9E%8B)多级缓存的架构，每个内核都有自己的[缓存](https://zh.wikipedia.org/wiki/CPU%E7%BC%93%E5%AD%98)，如下图:
 
 ![CPU多级缓存](http://blog.xiebiao.com/images/2020-08-19-locks-on-multicore/CPU_Cache.png "")
 
 由于内存读取速度的较慢(科技发展遇到了阻碍?)，但是CPU计算速度提升较快，所以CPU厂商才在内存和CPU之间加了多级缓存来缓解速度的不对等，充分利用CPU。来自Red Hat工程师这篇[**_What Every Programmer Should Know About Memory_**](https://people.freebsd.org/~lstewart/articles/cpumemory.pdf) 论文进行了详细的介绍，为何要设计多级CPU缓存。
+
+其他的处理器架构可以阅读[**_Overview of Recent Supercomputers_**](http://www.netlib.org/utk/papers/advanced-computers/overview.html)，后面讨论相关锁算法的时候会基于某个处理器架构来说。
 
 但这里我们只需要有一个直观的理解，如下图：
 
@@ -297,6 +299,8 @@ public class MCSLock  {
 
 ## 参考
 
+- [*Overview of Recent Supercomputers*](http://www.netlib.org/utk/papers/advanced-computers/overview.html)
+  
 - [*Algorithms for scalable synchronization on shared-memory multiprocessors*](https://www.cs.rice.edu/~johnmc/papers/tocs91.pdf)
 
 - [*What Every Programmer Should Know About Memory*](https://people.freebsd.org/~lstewart/articles/cpumemory.pdf)
@@ -306,3 +310,4 @@ public class MCSLock  {
   
 - [*Caching*](https://cseweb.ucsd.edu/classes/sp13/cse141-a/Slides/10_Caches_detail.pdf)
 
+- [*Multi-Core in JAVA/JVM*](http://www.cs.hut.fi/u/tlilja/multicore/slides/java_multicore.pdf)
