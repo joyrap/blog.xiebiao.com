@@ -11,6 +11,7 @@ tags: ["Concurrency"]
 > 致富的途径只有两种：一种是拼命赚钱，另外一种就是有钱后节约花钱。
 
 ## 什么是锁
+
 在计算机硬件层其实是没有`锁`这个概念的，计算机领域中的`锁`来源于现实生活中的锁，它的作用是保护某种资源同一时间不能被多人访问。现代计算机已经发展成了多核CPU处理器，我们需要通过锁机制来协调多个内核对资源的访问操作。
 
 和现实中一样，在给资源上锁的时候，我们可能需要几个步骤：
@@ -28,6 +29,7 @@ tags: ["Concurrency"]
 - get_and_add
   
 **test_and_set** 由3条CPU原语组成
+
 ``` c
 ​    boolean test_and_set(*lock){
 ​       boolean old=*lock;
@@ -36,7 +38,9 @@ tags: ["Concurrency"]
     }
 
 ```
+
 BTS 指令含义是在执行 BT 命令的同时, 把操作数的指定位置为 1
+
 ``` c
   do{
        //当*lock为false是跳出该循环
@@ -45,8 +49,10 @@ BTS 指令含义是在执行 BT 命令的同时, 把操作数的指定位置为 
       *lock=false;
 }while(true)
 ```
+
 **swap**也是由三条CPU原语组成:
 BSWAP指令含义是：把32/64位寄存器的值按照低和高的字节交换(下面代码实现其实就是0=false,1=true交换)
+
 ``` c
 void swap(boolean *a,boolean *b){
     boolean temp=*a;
@@ -63,9 +69,10 @@ do{
     lock=false;
 }while(true)
 ```
+
 上面简要地说明了通过CPU硬件同步原语，对某个内存地址标志位的修改，起到加锁的作用。
 
-那么锁机制和性能有什么关系呢？这得从CPU缓存说起，因为你要加的锁在CPU缓存中。
+那么锁机制和性能有什么关系呢？这得从内存(`Memory`)，CPU缓存说起。
 
 ## 多核CPU多级缓存架构
 
@@ -76,7 +83,7 @@ do{
 
 ![CPU多级缓存](http://blog.xiebiao.com/images/2020-08-19-locks-on-multicore/CPU_Cache.png "")
 
-由于内存读取速度的较慢(科技发展遇到了阻碍?)，但是CPU读取速度提升较快，所以CPU厂商才在内存和CPU之间加了多级缓存来缓解速度的不对等，充分利用CPU。来自Red Hat工程师这篇[**_What Every Programmer Should Know About Memory_**](https://people.freebsd.org/~lstewart/articles/cpumemory.pdf) 论文进行了详细的介绍，为何要设计多级CPU缓存。
+由于内存读取速度的较慢(科技发展遇到了阻碍?)，但是CPU计算速度提升较快，所以CPU厂商才在内存和CPU之间加了多级缓存来缓解速度的不对等，充分利用CPU。来自Red Hat工程师这篇[**_What Every Programmer Should Know About Memory_**](https://people.freebsd.org/~lstewart/articles/cpumemory.pdf) 论文进行了详细的介绍，为何要设计多级CPU缓存。
 
 但这里我们只需要有一个直观的理解，如下图：
 
@@ -121,9 +128,11 @@ while(test_and_set(*lock));
 2. 过度消耗CPU资源
 3. 竞争不具备公平性
 
-第2点，业界经过测试发现test_and_set锁随着线程和内核的增长，会导致exponential backoff，毫无可扩展性可言。
+第2点，业界经过测试发现test_and_set锁随着线程和内核的增长，会导致[Exponential backoff](https://en.wikipedia.org/wiki/Exponential_backoff)，
 
->"Exponential backoff is an algorithm that uses feedback to multiplicatively decrease the rate of some process, in order to gradually find an acceptable rate"
+>"Exponential backoff is an algorithm that uses feedback to multiplicatively decrease the rate of some process, in order to gradually find an acceptable rate."
+
+指数补偿重试等待算法在CPU内核方便并不是适用(适用于网络请求场景中)。
 
 对于第3点，很容易想到，如果执行单元释放了锁，后面哪个执行单元会获取到锁呢？这里没有机制保证每个执行单元都能获取到锁。
 
@@ -134,6 +143,8 @@ while(test_and_set(*lock));
 CLH锁解决了饥饿问题，通过FIFO来保证公平性。
 
 CLH锁也是一种基于链表的可扩展、高性能、公平的自旋锁，申请线程只在本地变量上自旋，它不断轮询前驱的状态，如果发现前驱释放了锁就结束自旋。
+
+![CLH Lock](http://blog.xiebiao.com/images/2020-08-19-locks-on-multicore/CLH.png "")
 
 CLH锁的实现如下:
 
@@ -186,6 +197,8 @@ public class CLHLock {
 
 CLH自旋锁的优点是空间复杂度低，L个线程n个锁的复杂度为O（L+n）。
 
+### JAVA中的AQS并发框架
+
 JAVA中的AQS并发框架(`java.util.concurrent.locks.AbstractQueuedSynchronizer.Node`)也是基于CLH锁，但是它是一个变种，它考虑了等待队列中取消获取锁的情况，以及释放锁的线程可以向获取同一把锁的线程发送消息。
 
 JDK中的描述:
@@ -224,6 +237,8 @@ JDK中的描述:
 
 1991年这篇[**_Algorithms for scalable synchronization on shared-memory multiprocessors_**](https://www.cs.rice.edu/~johnmc/papers/tocs91.pdf)论文提出了MCS(John Mellor-Crummey and Michael Scott)锁，针对CLH锁进行了优化，其主要区别是自旋发生在本地节点上。
 
+![MCS Lock](http://blog.xiebiao.com/images/2020-08-19-locks-on-multicore/MCS.png "")
+
 实现如下:
 
 1. 队列初始化时没有结点，tail=null
@@ -238,9 +253,9 @@ public class MCSLock  {
     private ThreadLocal<QNode> current;
 
     public void lock() {
-        tail = new AtomicReference<QNode>(new QNode());  
+        this.tail = new AtomicReference<QNode>(new QNode());  
         QNode current = this.current.get();
-        QNode pred = tail.getAndSet(current);
+        QNode pred = this.tail.getAndSet(current);
         if (pred != null) {
             current.locked = true;
             pred.next = current;
