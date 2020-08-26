@@ -79,6 +79,10 @@ do{
 早期的CPU架构基本上都采用[SMP(Symmetric Multi-Processor)](https://zh.wikipedia.org/wiki/%E5%AF%B9%E7%A7%B0%E5%A4%9A%E5%A4%84%E7%90%86)，这种对称多处理器结构，多个CPU内核共享内存资源，除了内存速度访问慢以外，
 还可能导致访问冲突。
 
+![SMP](http://blog.xiebiao.com/images/2020-08-19-locks-on-multicore/CPU_Cache_0.png "")
+
+CPU通过北桥访问内存。
+
 现代CPU为了提高数据的访问速度，采用了[NUMA(Non-Uniform Memory Access)](https://zh.wikipedia.org/wiki/%E9%9D%9E%E5%9D%87%E5%8C%80%E8%AE%BF%E5%AD%98%E6%A8%A1%E5%9E%8B)多级缓存的架构，每个内核都有自己的[缓存](https://zh.wikipedia.org/wiki/CPU%E7%BC%93%E5%AD%98)，如下图:
 
 ![CPU多级缓存](http://blog.xiebiao.com/images/2020-08-19-locks-on-multicore/CPU_Cache.png "")

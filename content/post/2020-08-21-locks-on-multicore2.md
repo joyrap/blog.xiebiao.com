@@ -77,3 +77,4 @@ tags: ["Concurrency"]
 ## 相关阅读
 
 - [*计算机多内核平台上的锁优化(一)*](https://blog.xiebiao.com/post/2020-08-19-locks-on-multicore/)
+-  [*The ccNUMA Memory Profiler*](http://www.cs.utah.edu/~ald/pubs/CC-numa.pdf)
