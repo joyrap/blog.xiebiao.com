@@ -81,3 +81,4 @@ tags: ["Concurrency"]
 - [*计算机多内核平台上的锁优化(一)*](https://blog.xiebiao.com/post/2020-08-19-locks-on-multicore/)
 - [*The ccNUMA Memory Profiler*](http://www.cs.utah.edu/~ald/pubs/CC-numa.pdf)
 - [*Overview of Recent Supercomputers*](http://www.netlib.org/utk/papers/advanced-computers/overview.html)
+- [*A Hierarchical CLH Queue Lock*](https://people.csail.mit.edu/shanir/publications/CLH.pdf)
