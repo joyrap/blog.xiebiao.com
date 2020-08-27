@@ -82,3 +82,4 @@ tags: ["Concurrency"]
 - [*The ccNUMA Memory Profiler*](http://www.cs.utah.edu/~ald/pubs/CC-numa.pdf)
 - [*Overview of Recent Supercomputers*](http://www.netlib.org/utk/papers/advanced-computers/overview.html)
 - [*A Hierarchical CLH Queue Lock*](https://people.csail.mit.edu/shanir/publications/CLH.pdf)
+- [*A General Technique for Designing NUMA Locks*](http://groups.csail.mit.edu/mag/a13-dice.pdf)

@@ -185,26 +185,26 @@ public class CLHLock {
 
     public void lock() {
         QNode current = this.current.get(); 
-        current.lock = true;
+        current.locked = true;
         QNode pred = this.tail.getAndSet(current); 
         this.prev.set(pred); 
-        while (pred.lock) ;//自旋
+        while (pred.locked) ;//自旋
     }
 
     public void unlock() {
         QNode current = this.current.get();
-        current.lock = false;
+        current.locked = false;
         this.current.set(this.prev.get());
         current = null;//GC
     }
 
     private static class QNode {
-        private volatile boolean lock = false;
+        private volatile boolean locked = false;
     }
 }
 ```
 
-CLH自旋锁的优点是空间复杂度低，L个线程n个锁的复杂度为O（L+n）。
+CLH自旋锁的优点是空间复杂度低，L个线程n个锁的复杂度为`O(L+n)`。
 
 ### JAVA中的AQS并发框架
 
