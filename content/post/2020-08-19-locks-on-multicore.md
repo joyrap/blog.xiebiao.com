@@ -141,7 +141,7 @@ while(test_and_set(*lock));
 
 >"Exponential backoff is an algorithm that uses feedback to multiplicatively decrease the rate of some process, in order to gradually find an acceptable rate."
 
-指数补偿重试等待算法在CPU内核方便并不是适用(适用于网络请求场景中)。
+指数补偿重试等待算法在CPU内核方面并不是适用(适用于网络请求场景中)。
 
 对于第3点，很容易想到，如果执行单元释放了锁，后面哪个执行单元会获取到锁呢？这里没有机制保证每个执行单元都能获取到锁。
 
