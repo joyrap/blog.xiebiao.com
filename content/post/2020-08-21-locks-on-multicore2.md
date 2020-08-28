@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  计算机多内核平台上的锁优化(二)
+title:  计算机多内核平台上的并发锁优化(二)
 date:   2020-08-21
 categories: ["Programming"]
 tags: ["Concurrency"]
