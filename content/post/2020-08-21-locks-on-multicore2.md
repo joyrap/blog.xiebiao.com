@@ -58,13 +58,12 @@ tags: ["Concurrency"]
 
 在`The Ticket Lock`之后还有`Array-Based Queuing Locks`，但由于基于数组的队列锁，性能更不理想，所以就略过了。
 
-在`Array-Based Queuing Locks`之后就是 `List-Based Queuing Lock `，[*计算机多内核平台上的锁优化(一)*](https://blog.xiebiao.com/post/2020-08-19-locks-on-multicore/)中讲到的CLH锁和MCS锁都是基于链表队列实现的。
+在`Array-Based Queuing Locks`之后就是 `List-Based Queuing Lock `，[*计算机多内核平台上的并发锁优化(一)*](https://blog.xiebiao.com/post/2020-08-19-locks-on-multicore/)中讲到的CLH锁和MCS锁都是基于链表队列实现的。
 
 ## 栅栏(BARRIERS)
 首先对`Barrier`这个中文翻译解释一下，实际上[朗文词典对该词给出的英文翻译如下](https://www.ldoceonline.com/dictionary/barrier)：
 
 - 1、a rule, problem etc that prevents people from doing something, or limits what they can do
-  
 - 2、a type of fence or gate that prevents people from moving in a particular direction
 - 3、a physical object that keeps two areas, people etc apart
 
@@ -78,7 +77,7 @@ tags: ["Concurrency"]
 
 ## 相关阅读
 
-- [*计算机多内核平台上的锁优化(一)*](https://blog.xiebiao.com/post/2020-08-19-locks-on-multicore/)
+- [*计算机多内核平台上的并发锁优化(一)*](https://blog.xiebiao.com/post/2020-08-19-locks-on-multicore/)
 - [*The ccNUMA Memory Profiler*](http://www.cs.utah.edu/~ald/pubs/CC-numa.pdf)
 - [*Overview of Recent Supercomputers*](http://www.netlib.org/utk/papers/advanced-computers/overview.html)
 - [*A Hierarchical CLH Queue Lock*](https://people.csail.mit.edu/shanir/publications/CLH.pdf)
